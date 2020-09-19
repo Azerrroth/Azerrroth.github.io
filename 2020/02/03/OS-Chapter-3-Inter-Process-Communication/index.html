@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#561f55">
+  <meta name="description" content="">
+  <meta name="author" content="Azerrroth">
+  <meta name="keywords" content="">
+  <title>OS Chapter 3 Inter-Process Communication ~ Codeless</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Codeless</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/Background/earth.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2020-02-03 16:00">
+      February 3, 2020 pm
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      21
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="Race-Condition-竞争条件-竞态"><a href="#Race-Condition-竞争条件-竞态" class="headerlink" title="Race Condition 竞争条件/竞态"></a>Race Condition 竞争条件/竞态</h2><h3 id="竞态"><a href="#竞态" class="headerlink" title="竞态"></a>竞态</h3><p>定义：</p>
+<ul>
+<li>两个或多个进程读写某些共享数据，而最后的结果<strong>取决于进程运行的精确时序</strong>，称为竞争条件（race condition）</li>
+<li>two or more processes are reading or writing some shared data and the final result depends on who runs precisely<h3 id="临界区"><a href="#临界区" class="headerlink" title="临界区"></a>临界区</h3>需要互斥（mutual exclusion）<br>临界区：对<strong>共享内存</strong>进行访问的<strong>程序片段</strong>称为<strong>临界区域</strong>（critical region/critical section）<br>临界资源（Critical Resource）：文件，内存、信号量</li>
+</ul>
+<h3 id="避免竞态的条件"><a href="#避免竞态的条件" class="headerlink" title="避免竞态的条件"></a>避免竞态的条件</h3><ol>
+<li>任何两个进程不能同时处于其临界区</li>
+<li>不应对CPU的速度和数量做任何假设</li>
+<li>临界区外运行的进程不得阻塞其他进程</li>
+<li>不得使进程无限期等待进入临界区<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715436636-909d68a2-b75a-4e20-aa49-84184f87fe05.png#height=402&amp;width=788" srcset="/img/loading.gif" alt=""> </li>
+</ol>
+<h2 id="Mutual-Exclusion-进程互斥"><a href="#Mutual-Exclusion-进程互斥" class="headerlink" title="Mutual Exclusion 进程互斥"></a>Mutual Exclusion 进程互斥</h2><p>当进程在临界区中更新共享内存时，其他进程将不会进入临界区</p>
+<h3 id="屏蔽中断（硬件-物理解决方式）"><a href="#屏蔽中断（硬件-物理解决方式）" class="headerlink" title="屏蔽中断（硬件/物理解决方式）"></a>屏蔽中断（硬件/物理解决方式）</h3><p>每个进程刚进入临界区后就立即屏蔽所有中断，并在离开之前打开中断。<br>CPU只有发生时钟中断或者其他中断才会切换进程，这样一来就不会进行进程切换了。<br>所以，进程屏蔽中断之后，他就可以检查和修改共享内存，而不必担心其他进程介入<br><strong>缺点：</strong>把屏蔽中断的权利交给用户程序是不明智的，因为一旦不再打开中断，就会造成严重的后果。<br><strong>屏蔽中断对于操作系统本身而言是一项很有用的技术，但对于用户进程则不是一种合适的通用互斥机制。</strong></p>
+<h3 id="锁变量（软件解决方式）"><a href="#锁变量（软件解决方式）" class="headerlink" title="锁变量（软件解决方式）"></a>锁变量（软件解决方式）</h3><p>设定一个信号量，锁定变量，初始位0，当程序进入临界区，如果0就可以进入，然后把值设置为1。如果是1，就等待直到值变为0。<br>0表示临界区没有进程，1表示已经有某个进程进入临界区<br><strong>缺点：</strong>也会出现假脱机类似的问题，即A读出0，并在将其设定为1之前，程序B读出信号量也是0，就出现问题了。</p>
+<h3 id="严格轮换法"><a href="#严格轮换法" class="headerlink" title="严格轮换法"></a>严格轮换法</h3><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715436932-d3b7794f-e681-4fb0-bd86-52f3f44dfd36.png#height=356&amp;width=866" srcset="/img/loading.gif" alt=""><br>设定整型变量turn，初始值0，a执行进入临界区后turn设定为1，b执行进入临界区后turn设定为0，在一个等待循环中不断测试turn，直到某个值出现，称为<strong>忙等待（busy waiting）</strong>，浪费CPU时间，通常避免。<br>仅在确定等待时间非常短的情况下才使用忙等待，<strong>忙等待的锁</strong>称为<strong>自旋锁</strong>（spin lock）<br>严格要求两个进程<strong>轮流进入</strong>临界区，违反了条件3（A进入后，不管B有没有进入，都得等B进入一次后才能再次进入）。</p>
+<h3 id="Peterson-Solution"><a href="#Peterson-Solution" class="headerlink" title="Peterson Solution"></a>Peterson Solution</h3><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715437426-8212d173-6b4d-41d1-a0b4-d354c7882990.png#height=624&amp;width=900" srcset="/img/loading.gif" alt=""><br>各进程用其进程号（0/1）作为参数调用enter_region，调用后将turn这是为进程号，然后直到等另一个进程（other）的interested[other]变为FALSE之后，才进入进程。</p>
+<h3 id="TSL指令（硬件方案）"><a href="#TSL指令（硬件方案）" class="headerlink" title="TSL指令（硬件方案）"></a>TSL指令（硬件方案）</h3><p><code>TSL RX，LOCK</code><br>测试并加锁（Test and Set Lock），将内存字lock读入寄存器RX，然后后在该地址存非零值，保证读字和写字操作不可分割。<br>（与屏蔽中断不同，屏蔽中断并<strong>不能解决多核心问题</strong>，因为对于CPU1屏蔽，CPU2没有任何影响，让CPU2远离内存的唯一方法就是<strong>锁住总线</strong>，就需要硬件）<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715437748-4750e373-581f-43c5-8df9-6547bbe07813.png#height=366&amp;width=896" srcset="/img/loading.gif" alt=""><br>还有一个XCHG指令，原子性的交换了讲个位置的内容，如一个寄存器与一个存储器字<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715438011-0dfd9eae-428e-4262-82c3-6cf160557998.png#height=398&amp;width=898" srcset="/img/loading.gif" alt=""><br>会出现<strong>优先级反转问题</strong>（priority inversion problem），高优先级的程序被低优先级的程序抢占。</p>
+<h3 id="生产者-消费者问题（Producer-Consumer-Problem）-互斥操作要放在同步操作之后"><a href="#生产者-消费者问题（Producer-Consumer-Problem）-互斥操作要放在同步操作之后" class="headerlink" title="生产者-消费者问题（Producer-Consumer Problem）//互斥操作要放在同步操作之后"></a>生产者-消费者问题（Producer-Consumer Problem）//互斥操作要放在同步操作之后</h3><p>有界缓冲区问题（bounded-buffer）<br>两进程共享公共固定缓冲区，一个生产者，一个消费者。<br>添加唤醒等待位，解决wakeup信号丢失的问题，如果一个唤醒等待为</p>
+<h3 id="信号量-Semaphore"><a href="#信号量-Semaphore" class="headerlink" title="信号量 Semaphore"></a>信号量 Semaphore</h3><p>down：对信号量操作，检查是否大于0，如果大于0，则减一，如果为0，则进程睡眠。<br>up：对信号量增1，如果处于睡眠，无法down，则系统选择一个程序允许弯沉down。如果up后仍然是0，但其仍处于睡眠状态，则睡眠少一个。</p>
+<p>二元信号量（binary semaphore）：供两个或多个进程使用的信号量，其初值为1，保证同时只有一个进程可以进入临界区，称作二元信号量</p>
+<h3 id="互斥量-mutex"><a href="#互斥量-mutex" class="headerlink" title="互斥量 mutex"></a>互斥量 mutex</h3><p>信号量的简化版，处于两态之一的变量：解锁、加锁。0表示解锁，其他所有值表示加锁。<br>线程/进程访问临界区时，调用mutex_lock，如果临界区可用，则调用成功，线程进入临界区。如果临界区不可用，则等待，直到临界区中的线程调用mutex_unlock，如果有多个等待，则随机选择一个，允许获得锁。<br>enter_region进入临界区失败会忙等待，而mutex_lock失败会调用thread_yield将CPU放弃给另一个线程。当该线程再次运行时候，则再进行一次锁测试。<br>上锁调用mutex_trylock，可以选择成功操作，或者失败了采取什么操作。</p>
+<h3 id="pthread"><a href="#pthread" class="headerlink" title="pthread"></a>pthread</h3><p>互斥量：<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715438240-088765ee-eb40-4c99-b0a6-c0ab1964a3ae.png#height=368&amp;width=764" srcset="/img/loading.gif" alt=""><br>条件变量：<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715438514-2541e8db-e690-4a08-9055-e665d7d7b993.png#height=404&amp;width=768" srcset="/img/loading.gif" alt=""> </p>
+<h3 id="管程"><a href="#管程" class="headerlink" title="管程"></a>管程</h3><p>组合：</p>
+<ol>
+<li>局部于管程的共享数据结构说明</li>
+<li>对该数据结构进行操作的一组过程</li>
+<li>对局部于管程的共享数据就设定初始值的语句</li>
+<li>有一个名字</li>
+</ol>
+<p>管程是一个由<strong>过程（函数）、变量（共享数据+初始值）及数据结构（共享数据结构）等</strong>组成的一个集合。</p>
+<p>基本特征：</p>
+<ol>
+<li>局部于管程的数据只能被<strong>局部于管程的过程</strong>访问</li>
+<li>一个进程只有通过调用管程内的过程，才能<strong>进入管程访问共享数据</strong></li>
+<li>每次<strong>仅允许一个进程在管程内执行某个内部过程</strong></li>
+</ol>
+<p>任意时刻，管程中只能有一个活跃的进程（其他的阻塞）<br>外部的进程/线程只能通过管程提供的特定的“入口”才能访问共享数据<br>每次仅允许一个进程在管程内执行某个内部过程</p>
+<p>由<strong>编译器</strong>实现各个进程互斥地进入管程中的过程<br>设置条件变量用来实现同步（排队）问题，等待/唤醒操作</p>
+<h3 id="消息传递-message-passing"><a href="#消息传递-message-passing" class="headerlink" title="消息传递 message passing"></a>消息传递 message passing</h3><h3 id="屏障-Barrier"><a href="#屏障-Barrier" class="headerlink" title="屏障 Barrier"></a>屏障 Barrier</h3><p>用于<strong>进程组</strong><br>除非所有的进程都就绪准备着手下一个阶段，否则任何进程都不能进入下一个阶段<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715438805-1cbbaec0-2d4d-47d4-9e39-5d9e10167e06.png#height=516&amp;width=930" srcset="/img/loading.gif" alt=""> </p>
+<h2 id="Synchronization-同步"><a href="#Synchronization-同步" class="headerlink" title="Synchronization 同步"></a>Synchronization 同步</h2><h2 id="Communication-通讯"><a href="#Communication-通讯" class="headerlink" title="Communication 通讯"></a>Communication 通讯</h2><h2 id="经典IPC问题"><a href="#经典IPC问题" class="headerlink" title="经典IPC问题"></a>经典IPC问题</h2><h2 id="多生产者-多消费者问题"><a href="#多生产者-多消费者问题" class="headerlink" title="多生产者-多消费者问题"></a>多生产者-多消费者问题</h2><p>多类，生产者消费者仅仅获取其需要的<br>对于缓冲区大于1的情况，就要设置互斥信号量。而如果缓冲区为1，则不需要设置互斥信号量。<br>抽象化为事件，事件A→事件B，这样进行分析。</p>
+<h2 id="抽烟者问题"><a href="#抽烟者问题" class="headerlink" title="抽烟者问题"></a>抽烟者问题</h2><p>三个抽烟者进程，一个供应者进程。</p>
+<h2 id="Reader-Writer-Problem"><a href="#Reader-Writer-Problem" class="headerlink" title="Reader-Writer Problem"></a>Reader-Writer Problem</h2><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715439182-0726d910-5d51-44ee-a858-fdc5877624f9.png#height=708&amp;width=1022" srcset="/img/loading.gif" alt=""> </p>
+<p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715439614-b2358be1-3ffa-4c59-8399-772776e73588.png#height=814&amp;width=1080" srcset="/img/loading.gif" alt=""> </p>
+<h2 id="The-Dining-Philosophers-Problem-哲学家吃饭问题"><a href="#The-Dining-Philosophers-Problem-哲学家吃饭问题" class="headerlink" title="The Dining Philosophers Problem 哲学家吃饭问题"></a>The Dining Philosophers Problem 哲学家吃饭问题</h2><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715440034-0657dcff-c63d-4574-9f95-cf7b192ddf81.png#height=786&amp;width=1084" srcset="/img/loading.gif" alt=""><br>要访问两个（或以上）<strong>临界资源</strong><br>需要解决死锁问题。</p>
+<ol>
+<li>限制同时吃饭的人数</li>
+<li>规定奇数号拿右边筷子，偶数拿左边筷子</li>
+<li>对拿筷子操作设定互斥量，尽管拿个不是同一个筷子。</li>
+</ol>
+<h2 id="The-Sleeping-Barber-Problem-理发师问题"><a href="#The-Sleeping-Barber-Problem-理发师问题" class="headerlink" title="The Sleeping Barber Problem 理发师问题"></a>The Sleeping Barber Problem 理发师问题</h2><p>一位理发师、一把理发椅、n把供等候理发的顾客坐的椅子<br>如果没有顾客，理发师睡觉<br>第一个顾客，要叫醒理发师、后面的顾客，如果有椅子，则坐下，如果没有，则离开<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715440326-fcbe9a78-2b15-4f64-8931-69147154ab62.png#height=510&amp;width=760" srcset="/img/loading.gif" alt=""> </p>
+<h2 id="Summary-：Inter-Process-Data-Communication"><a href="#Summary-：Inter-Process-Data-Communication" class="headerlink" title="Summary ：Inter-Process Data Communication"></a>Summary ：Inter-Process Data Communication</h2><h3 id="Shared-Memory-System"><a href="#Shared-Memory-System" class="headerlink" title="Shared-Memory System"></a>Shared-Memory System</h3><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715440655-e47e0c4c-4d54-4bc2-9bf6-f668929ec2b2.png#height=378&amp;width=614" srcset="/img/loading.gif" alt=""> </p>
+<h3 id="Message-Passing-System"><a href="#Message-Passing-System" class="headerlink" title="Message Passing System"></a>Message Passing System</h3><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715440965-8c21426b-6762-4d56-801d-389b84179483.png#height=528&amp;width=802" srcset="/img/loading.gif" alt=""> </p>
+<h3 id="Pipeline-System"><a href="#Pipeline-System" class="headerlink" title="Pipeline System"></a>Pipeline System</h3><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715441294-09f3ad20-0dcd-4236-a4c7-f76f0ff85eb0.png#height=504&amp;width=600" srcset="/img/loading.gif" alt=""> </p>
+<h3 id="Remote-Procedure-Call"><a href="#Remote-Procedure-Call" class="headerlink" title="Remote Procedure Call"></a>Remote Procedure Call</h3><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580715441513-0660bdd6-f37d-4efd-9a96-a2c3687eefb8.png#height=318&amp;width=818" srcset="/img/loading.gif" alt=""> </p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-Operating-System/">操作系统(Operating System)</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Operating-System/">Operating System</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/02/03/OS-Chapter-4-Process-Thread-Scheduling/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">OS Chapter 4 Process Thread Scheduling</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/02/03/OS-Chapter-2-Process-Thread-Concepts/">
+                        <span class="hidden-mobile">OS Chapter 2 Process & Thread Concepts</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <script type="text/javascript">
+    function loadUtterances() {
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.defer = false
+      s.setAttribute('repo', 'Azerrroth/comments-utterances');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('theme', 'github-light');
+      s.setAttribute('crossorigin', 'anonymous');
+      var e = document.getElementsByTagName('script')[0];
+      e.parentNode.insertBefore(s, e);
+    }
+    createObserver(loadUtterances, 'comments')
+  </script>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "OS Chapter 3 Inter-Process Communication&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "false",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+</body>
+</html>

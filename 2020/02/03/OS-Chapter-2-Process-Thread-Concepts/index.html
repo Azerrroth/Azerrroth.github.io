@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#561f55">
+  <meta name="description" content="">
+  <meta name="author" content="Azerrroth">
+  <meta name="keywords" content="">
+  <title>OS Chapter 2 Process &amp; Thread Concepts ~ Codeless</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Codeless</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/Background/earth.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2020-02-03 15:37">
+      February 3, 2020 pm
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.3k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      24
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="Execution"><a href="#Execution" class="headerlink" title="Execution"></a>Execution</h2><h3 id="Program"><a href="#Program" class="headerlink" title="Program"></a>Program</h3><ul>
+<li>就是一个指令序列</li>
+<li>程序在内存中：存放程序段、数据段</li>
+<li>Input、Compute、Print</li>
+<li>执行方式:<ul>
+<li>顺序执行<ul>
+<li>内存、CPU、系统资源都属于单个程序</li>
+</ul>
+</li>
+<li>并发执行<ul>
+<li>PCB 进程控制块，放在内存中。用来描述进程的各种信息</li>
+<li>内存中存放程序段，数据段</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><p><strong>进程是资源分配的最小单位</strong><br><strong>程序段、数据段、PCB</strong>三部分组成了进程实体。<br>程序段存放程序代码，数据段存放运行时使用、产生的运算数据，如全局变量、局部变量、宏定义常量，都在数据段。<br>进程是一个动态过程<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580713115778-d2e06375-de3a-4a34-b510-e31539e4088e.png#height=356&amp;width=228" srcset="/img/loading.gif" alt=""> </p>
+<h3 id="进程的组成"><a href="#进程的组成" class="headerlink" title="进程的组成"></a>进程的组成</h3><ul>
+<li>PCB <ul>
+<li>进程描述信息<ul>
+<li>PID 进程标识符：进程被创建时分配的唯一的、不重复的ID，用于区分不同进程</li>
+<li>UID 用户标识符</li>
+</ul>
+</li>
+<li>进程管理控制信息<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580713116140-1a3f65f2-235a-4d51-8f59-71fb39f28042.png#height=558&amp;width=1038" srcset="/img/loading.gif" alt=""> </li>
+</ul>
+</li>
+</ul>
+<h3 id="进程的组织（多个进程要以什么方式组织起来）"><a href="#进程的组织（多个进程要以什么方式组织起来）" class="headerlink" title="进程的组织（多个进程要以什么方式组织起来）"></a>进程的组织（多个进程要以什么方式组织起来）</h3><ol>
+<li><p>链接方式</p>
+<ul>
+<li>按照进程状态将PCB分为多个队列</li>
+<li><p>操作系统持有指向各个队列的指针</p>
+</li>
+<li><p>执行指针：指向当前处于运行态的进程。（单CPU中，同一时刻只会有一个进程处于运行状态）</p>
+</li>
+<li>就绪队列指针：指向当前处于就绪状态的进程。（优先级高的放在前面）</li>
+<li>阻塞队列指针：指向当前处于阻塞状态的进程，很多操作系统还会根在·据阻塞原因不同，再分为多个阻塞队列。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580713116521-8658db41-f4a6-4b72-b599-48d9c9741479.png#height=482&amp;width=902" srcset="/img/loading.gif" alt=""> </li>
+</ul>
+</li>
+<li><p>索引方式</p>
+<ul>
+<li>按照进程状态建立几张索引表</li>
+<li>操作系统持有指向各个索引表的指针<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580713116863-42edf999-26f2-4d43-94b2-4dc24f11e418.png#height=560&amp;width=904" srcset="/img/loading.gif" alt=""> </li>
+</ul>
+</li>
+</ol>
+<h3 id="进程的特征"><a href="#进程的特征" class="headerlink" title="进程的特征"></a>进程的特征</h3><p>进程相比程序，有特征：</p>
+<ul>
+<li><strong>动态性</strong>（基本特征）：进程是程序的一次执行过程，是动态地产生、变化和消亡的</li>
+<li><strong>并发性</strong>：内存中有多个进程实体，各进程可并发执行</li>
+<li><strong>独立性</strong>：进程是能独立运行、独立获得资源、独立接受调度的基本单位。（是资源分配、接受调度（有了线程以后就不是了）的基本单位）</li>
+<li><strong>异步性</strong>：各进程按各自独立、不可预知的速度向前推进，操作系统要提供“进程同步机制”来解决异步问题。（并发程序执行结果的不确定。）</li>
+<li><strong>结构性</strong>：每个进程配置一个PCB。从结构上看，进程由程序段、数据段、PCB组成</li>
+</ul>
+<h2 id="进程的状态与转换"><a href="#进程的状态与转换" class="headerlink" title="进程的状态与转换"></a>进程的状态与转换</h2><h3 id="进程的状态"><a href="#进程的状态" class="headerlink" title="进程的状态"></a>进程的状态</h3><ul>
+<li>运行态（Running）：占有CPU，在CPU上运行。（单核就只能有一个，双核可以同时有两个）</li>
+<li>就绪态（Ready）：已经具备运行条件，但没有空闲CPU，就暂时不能运行。（除了CPU，什么资源都已经有了）</li>
+<li>阻塞态（Waiting/Blocking）：因等待某事件而暂时不能运行。</li>
+<li>创建态（New）：进程正被创建，操作系统分配资源、初始化PCB</li>
+<li>终止态（Terminated）：进程从系统中撤销，操作系统回收资源、撤销PCB</li>
+</ul>
+<h3 id="进程的转换"><a href="#进程的转换" class="headerlink" title="进程的转换"></a>进程的转换</h3><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580713117219-4cb0e199-d621-45f5-8cf6-30126b9df746.png#height=492&amp;width=1030" srcset="/img/loading.gif" alt=""><br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580713117663-4167cc6e-e338-48ff-b4e0-1d400fa1e0be.png#height=602&amp;width=1112" srcset="/img/loading.gif" alt=""> </p>
+<h2 id="进程控制"><a href="#进程控制" class="headerlink" title="进程控制"></a>进程控制</h2><p>进程控制：实现进程状态的转换<br>进程控制通过原语实现，原语用关/开中断来实现。原语是一种特殊的程序，原语的执行必须一气呵成，不能中断（使用开中断、关中断指令实现）。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580713118087-a80ae416-5094-4f2b-b9cb-adf5cecf518f.png#height=582&amp;width=1106" srcset="/img/loading.gif" alt=""> </p>
+<h2 id="进程通信"><a href="#进程通信" class="headerlink" title="进程通信"></a>进程通信</h2><ol>
+<li>进程通信：进程之间的信息交换</li>
+<li><p>共享存储</p>
+<ul>
+<li>内存分配一个共享空间，两个进程通过共享空间交流。</li>
+<li>对于共享空间的访问必须是互斥的，不能同时写</li>
+<li>基于数据结构的共享：低级通信方式，速度慢，限制多</li>
+<li>基于存储区的共享：划分存储区，进程交流的方式由进程决定</li>
+</ul>
+</li>
+<li><p>消息传递</p>
+<ul>
+<li>以格式化消息来传递</li>
+<li>消息头、消息体组成（如计算机网络的报文）<ul>
+<li>直接通信方式：消息直接挂到消息缓冲队列的队尾</li>
+<li>间接通信方式：消息先发送到中间实体（信箱），如电子邮件系统（邮件服务器）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>管道通信</li>
+</ol>
+<ul>
+<li>管道：内存中固定大小的缓冲区</li>
+<li>管道只能实现半双工通信，某个时间只能单向传输。如果同时双向通信，需要设置两个管道</li>
+<li>各个进程要互斥地访问管道</li>
+<li>数据以字符流写入管道，管道写满，write()就阻塞，管道读空，read()就阻塞</li>
+<li>如果没写满，就不允许读。如果没读空，就不允许写</li>
+<li>数据一旦读出，就会被从管道中抛弃，则读管道的进程只能有一个<br>  <img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580713118545-0a000ee7-d174-46f3-9c9c-710f44a23fa2.png#height=722&amp;width=1100" srcset="/img/loading.gif" alt=""> </li>
+</ul>
+<h2 id="线程、多线程模型"><a href="#线程、多线程模型" class="headerlink" title="线程、多线程模型"></a>线程、多线程模型</h2><h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h3><p>线程是一个<strong>基本的CPU执行单元</strong>，也是<strong>程序执行流</strong>的最小单位。线程提升了系统的并发度，使得进程内也能并发处理各种任务。<br>引入线程后，进程是<strong>资源分配</strong>的基本单位，<strong>线程是调度的基本单位</strong>。<br>引入线程后，各线程间也能并发，提升<strong>并发度</strong>。<br>引入线程后，并发带来的<strong>系统开销减少</strong>。主要是进程并发需要陷入内核态，线程就不需要</p>
+<h4 id="线程的属性"><a href="#线程的属性" class="headerlink" title="线程的属性"></a>线程的属性</h4><p>线程是CPU调度的单位<br>多CPU计算机中，各个线程可占用不同的CPU<br>每个线程都有一个线程ID、线程控制块（TCB）<br>线程也有 <strong>就绪、阻塞、运行</strong> 三种基本状态<br>线程几乎不拥有系统资源<br>同一进程的不同线程之间共享进程的资源<br>由于共享内存地址空间，线程间通信不需要系统干预</p>
+<h3 id="线程的实现方式"><a href="#线程的实现方式" class="headerlink" title="线程的实现方式"></a>线程的实现方式</h3><h4 id="用户级线程"><a href="#用户级线程" class="headerlink" title="用户级线程"></a>用户级线程</h4><p>线程在用户态，操作系统内核看不到</p>
+<h4 id="内核级线程"><a href="#内核级线程" class="headerlink" title="内核级线程"></a>内核级线程</h4><p>线程运行在内核态，操作系统内核可以看得见</p>
+<h4 id="组合方式"><a href="#组合方式" class="headerlink" title="组合方式"></a>组合方式</h4><p>n个用户级线程映射到m个内核级线程上</p>
+<h3 id="多线程模型"><a href="#多线程模型" class="headerlink" title="多线程模型"></a>多线程模型</h3><h4 id="多对一模型"><a href="#多对一模型" class="headerlink" title="多对一模型"></a>多对一模型</h4><p>多个用户级线程映射到一个内核级线程，每个用户进程对应一个内核级线程</p>
+<ul>
+<li>优点：用户级线程的切换在用户空间完成，线程管理开销小，效率高</li>
+<li>缺点：用户级线程被阻塞，整个进程都会被阻塞，并发度不高，多个线程不能再多核机器并行运行<h4 id="一对一模型"><a href="#一对一模型" class="headerlink" title="一对一模型"></a>一对一模型</h4>一个用户级线程映射到一个内核级线程，每个用户进程有与用户线程同等数量的内核级线程</li>
+<li>优点：一个线程被阻塞，别的线程还能执行，并发能力强。</li>
+<li>缺点：一个进程占用多个内核级线程，线程管理成本高，开销大<h4 id="多对多模型"><a href="#多对多模型" class="headerlink" title="多对多模型"></a>多对多模型</h4>n用户级线程映射到m个内核级线程（n&gt;=m），每个用户进程对应m个内核级线程<br>同时克服了一对一模型的缺点和多对一模型的缺点。</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580713118834-def00419-dbb8-4d29-9c9c-6f39cf1f6036.png#height=330&amp;width=1118" srcset="/img/loading.gif" alt=""> </p>
+<p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580713119334-4b530ff5-301c-4677-bfd1-053a3a5fca52.png#height=756&amp;width=1170" srcset="/img/loading.gif" alt=""> </p>
+<h2 id="Modeling-Multiprogramming-多道程序设计模型"><a href="#Modeling-Multiprogramming-多道程序设计模型" class="headerlink" title="Modeling Multiprogramming  多道程序设计模型"></a>Modeling Multiprogramming  多道程序设计模型</h2><p>采用多道程序提高CPU利用率<br>$CPU utilization = 1 - p^{n}$ （p是进程等待IO的时间与其在内存中的时间比）<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580713119662-c8516ec0-fb9d-44e1-b283-c2454acb1b39.png#height=396&amp;width=662" srcset="/img/loading.gif" alt=""><br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580713119887-6fc997e7-7513-4275-90c6-a2f0d97fc290.png#height=358&amp;width=476" srcset="/img/loading.gif" alt=""><br>例子：对于一个512M内存的计算机，操作系统占128M，80%时间I/O，则CPU 利用率为=1-0.83=49%</p>
+<h3 id="线程信号控制"><a href="#线程信号控制" class="headerlink" title="线程信号控制"></a>线程信号控制</h3><p>Signal 被用来在UNIX系统中唤醒进程，当有事件发生时<br>Signal</p>
+<ul>
+<li>Signal is generated by particular event</li>
+<li>Signal is delivered to a process</li>
+<li>Signal is handled</li>
+</ul>
+<p>方式：</p>
+<ul>
+<li>将信号传送给信号量应用的线程</li>
+<li>将信号传递给进程的每个线程</li>
+<li>将信号传递给进程中特定线程</li>
+<li>指定一个特定线程来接受进程的所有信号</li>
+</ul>
+<h2 id="进程模型到线程模型的迁移"><a href="#进程模型到线程模型的迁移" class="headerlink" title="进程模型到线程模型的迁移"></a>进程模型到线程模型的迁移</h2><p>许多已有的程序是为单线程编写的，把这些程序改写为多线程会产生许多问题</p>
+<h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><ol>
+<li>对线程来说的<strong>全局变量</strong>对整个程序来说并不是全局的 </li>
+<li>许多<strong>库过程</strong>是不可重入的</li>
+<li>有些信号逻辑上是<strong>线程专用</strong>的，而有些不是</li>
+<li>堆栈的管理</li>
+</ol>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><ol>
+<li>UNIX维护的errno全局变量，对线程来说是全局的变量，若两个线程先后访问，第二次会修改第一次的结果</li>
+<li>UNIX的malloc()函数，在进行内存分配时，内存指针可能会指向不确定的位置，如果发生线程切换，会导致指针异常从而引起崩溃 </li>
+<li>例如某个线程调用信号alarm，如果线程完全由用户实现，内核根本不知道有线程的存在，很难将信号发送给正确的线程 </li>
+<li>如果一个堆栈溢出时，内核只需要为该进程提供更多的堆栈。当一个进程有多个线程时，就必须有多个堆栈。</li>
+</ol>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><ol>
+<li><strong>禁用全局变量</strong>或者是为每个线程建立一份单独的<strong>全局变量拷贝区</strong></li>
+<li>为每个过程提供一个<strong>包装器</strong>，该包装器设置一个二进制位来标志<strong>某个库正在使用中</strong>，在先前的调用为返回前，任何调用该库的线程都会被阻塞。（该方法会降低程序的并行性）</li>
+</ol>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-Operating-System/">操作系统(Operating System)</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Operating-System/">Operating System</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/02/03/OS-Chapter-3-Inter-Process-Communication/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">OS Chapter 3 Inter-Process Communication</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/01/16/OS-Chapter-1-Introduction/">
+                        <span class="hidden-mobile">OS Chapter 1 Introduction</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <script type="text/javascript">
+    function loadUtterances() {
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.defer = false
+      s.setAttribute('repo', 'Azerrroth/comments-utterances');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('theme', 'github-light');
+      s.setAttribute('crossorigin', 'anonymous');
+      var e = document.getElementsByTagName('script')[0];
+      e.parentNode.insertBefore(s, e);
+    }
+    createObserver(loadUtterances, 'comments')
+  </script>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "OS Chapter 2 Process & Thread Concepts&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "false",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+</body>
+</html>

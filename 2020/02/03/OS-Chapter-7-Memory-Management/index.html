@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#561f55">
+  <meta name="description" content="">
+  <meta name="author" content="Azerrroth">
+  <meta name="keywords" content="">
+  <title>OS Chapter 7 Memory Management ~ Codeless</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Codeless</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/Background/earth.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2020-02-03 16:15">
+      February 3, 2020 pm
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      5.4k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      57
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="No-Memory-Abstraction"><a href="#No-Memory-Abstraction" class="headerlink" title="No Memory Abstraction"></a>No Memory Abstraction</h2><p>没有存储器的抽象，程序直接访问物理内存。<br>帕金森定律：Programs expand to fill the memory available to hold them!<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719263896-759b6070-75e3-460b-b6d4-612533c5dfa5.png#height=658&amp;width=658" srcset="/img/loading.gif" alt=""><br>在不使用内存抽象的情况下运行多道程序<br>将两个程序装载到内存中，但是他们指令地址不一样，因为都引用了绝对的物理地址。（重定位问题）</p>
+<p>保护：（IBM 360）给内存块标记上一个保护键，并且比较执行进程的键和访问的每个内存字的保护键。<br>静态重定位：需要给b程序的指令地址全部+16380</p>
+<p>Basic Memory Management</p>
+<h2 id="地址空间"><a href="#地址空间" class="headerlink" title="地址空间"></a>地址空间</h2><p>地址空间是一个进程可用于寻址内存的一套<strong>地址集合</strong>，每个进程都有自己的地址空间，并且这个地址空间独立于其他的地址空间。</p>
+<h4 id="基址寄存器与界限寄存器（动态重定位）"><a href="#基址寄存器与界限寄存器（动态重定位）" class="headerlink" title="基址寄存器与界限寄存器（动态重定位）"></a>基址寄存器与界限寄存器（动态重定位）</h4><p>把每个进程的地址空间映射到物理内存的不同部分。<br>基址寄存器：程序的<strong>起始物理地址</strong>装载到基址寄存器中<br>界限寄存器：<strong>程序的长度</strong>装载到界限寄存器中<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719264146-842b0593-28ac-4c3d-9ebe-cfcec75fd31f.png#height=430&amp;width=388" srcset="/img/loading.gif" alt=""><br>每次访问内存，都给指令加上基址寄存器的值，然后和界限寄存器相比较，看看是否超出界限寄存器，如果超出，就发生错误了。<br>缺点：每次访问内存都需要进行加法和比较运算。比较可以比较快，但是加法就会慢一点。</p>
+<h3 id="交换技术"><a href="#交换技术" class="headerlink" title="交换技术"></a>交换技术</h3><ul>
+<li>交换技术：把一个进程完整调入内存，使该进程运行一段时间，然后把它存回磁盘。</li>
+<li>虚拟内存：能使程序在只有一部分被调入内存的情况下运行<h3 id="空闲内存管理"><a href="#空闲内存管理" class="headerlink" title="空闲内存管理"></a>空闲内存管理</h3><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719264411-28e07719-fa61-4120-8295-9f3708905125.png#height=450&amp;width=738" srcset="/img/loading.gif" alt=""> <h4 id="使用位图的存储管理"><a href="#使用位图的存储管理" class="headerlink" title="使用位图的存储管理"></a>使用位图的存储管理</h4>内存可能被划分为几个字or几千字节的分配单元<br>内存的大小和分配单元的大小决定了位图的大小<br>主要问题：查找位图中指定长度的连续0串是耗时的操作（目的是为了把一个占k个分配单元的进程调入内存）<h4 id="使用链表的存储管理"><a href="#使用链表的存储管理" class="headerlink" title="使用链表的存储管理"></a>使用链表的存储管理</h4>维护一个记录已分配内存段和空闲内存段的链表，其中链表的一个节点是 包含一个进程or两个进程间的一个空闲区<br>链表中每个节点包含：空闲区（H）or进程（P）的指示标志、起始地址、长度、指向下一个节点的指针<h5 id="为创建进程分配内存的算法"><a href="#为创建进程分配内存的算法" class="headerlink" title="为创建进程分配内存的算法"></a>为创建进程分配内存的算法</h5></li>
+</ul>
+<ol>
+<li>首次适配（first fit）算法：<ol>
+<li>存储管理器沿着段链表搜索，直到找到一个足够大的空闲区</li>
+<li>除非空闲区和要分配的空间大小一样，否则将空闲区分成两部分。一部分进程使用，另一部分是新的空闲区。</li>
+</ol>
+</li>
+<li>下次匹配（next fit）算法：<ol>
+<li>类似于首次匹配，但是每次找到合适空闲区时都记录当前位置，以便在下次寻找空闲区时从上次结束的地方开始搜索。<br><code>// 性能略低于首次匹配算法</code></li>
+</ol>
+</li>
+<li>最佳适配（best fit）算法：<ol>
+<li>搜索整个链表</li>
+<li>找出能够容纳进程的最小的空闲区<br><code>// 比ff和nf算法都浪费内存，因为会出现小的没法用的内存块，都浪费了</code></li>
+</ol>
+</li>
+<li>最差匹配（worst fit）算法：<ol>
+<li>搜索整个链表</li>
+<li>分配最大的可用空闲区<br><code>// 也不好使</code><br><code>// 上面的几个，可以改成为空闲区、进程区各维护一个链表，而且空闲块从小到大排序，就快很多，不用遍历链表</code></li>
+</ol>
+</li>
+<li>快速适配（quick fit）算法：<ol>
+<li>为常用大小的空闲区维护一个单独的链表<br>例如，有一个n项的表，该表的第一项是 指向大小为4KB的空闲区链表表头的指针，第二项是指向大小为8KB的 空闲区链表表头的指针，第三项是指向大小为12KB的空闲区链表表头 的指针，以此类推。<h4 id="伙伴式内存管理"><a href="#伙伴式内存管理" class="headerlink" title="伙伴式内存管理"></a>伙伴式内存管理</h4>所有内存块都是$2^n$的大小，每个块都能被分成两个更小的块<br>没有外碎片，只有内碎片<br>将全部的内存，分为$2^0、2^1、2^2、2^3、…、2^m$的大小。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719264626-96bd8658-8e91-4eb4-9c04-427e672385b8.png#height=232&amp;width=528" srcset="/img/loading.gif" alt=""><br>link、rlink：指向节点的直接前驱和直接后继节点。<br>tag：标记内存块状态，1是占用，0是空闲<br>kval：记录该存储块的容量，2m的容量，记录幂次<br>分配算法：<br>假设用户向系统申请大小为n的存储空间，若 $2^{k-1} &lt; n &lt;= 2^k$，就查看可用空间表中大小为$2^k$的链表中有没有可利用的空间节点：</li>
+</ol>
+</li>
+<li>如果该链表不为NULL，可以直接从头部取出一个节点，给用户使用</li>
+<li>如果大小为$2^k$的链表为NULL，就按需要一次查看比$2^k$大的链表，找到后从链表中删除，截取相应大小的空间（$2^k$）给用户使用，剩余的空间，根据大小插入到相应的链表中。<br>回收算法：<br>用户释放存储块时，需要判断该存储块的伙伴是否为空闲块，</li>
+<li>如果是空闲块，则将其合并，然后合并的新的空闲块还需要同伙伴进行判断整合</li>
+<li>如果不是空闲块，直接将空闲块根据大小插入可利用空间表中即可</li>
+</ol>
+<h2 id="Virtual-Memory"><a href="#Virtual-Memory" class="headerlink" title="Virtual Memory"></a>Virtual Memory</h2><p>每个程序拥有自己的地址空间，这个空间被分割成多个块，<strong>每一块称作一页或页面</strong>。每一页有连续的地址范围。</p>
+<h3 id="分页-paging"><a href="#分页-paging" class="headerlink" title="分页 paging"></a>分页 paging</h3><p>程序产生的地址称为<strong>虚拟地址</strong>（virtual address），构成的空间就是<strong>虚拟空间</strong>（virtual address space）<br>在虚拟内存情况下，虚拟地址是被送到<strong>内存管理单元</strong>（memory management unit，MMU），MMU把虚拟地址映射为物理内存地址。（MMU是CPU芯片的一部分）<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719264933-cc6c9532-b523-4ec1-a9ef-bd4221f10b2c.png#height=668&amp;width=606" srcset="/img/loading.gif" alt=""> </p>
+<p>页面（page）：虚拟地址空间按照固定大小划分成称为页面的若干段元<br>页框（page frame）：物理内存中的对应单元称为页框（page frame）</p>
+<h3 id="页表（page-table）"><a href="#页表（page-table）" class="headerlink" title="页表（page table）"></a>页表（page table）</h3><p>虚拟页号可用作页表的索引，以找到该虚拟页面对应的页表项。由页表找到页框号，然后把页框号拼接到偏移量的高位，替换掉虚拟页号，形成送往内存的物理地址。<br>页表：页表的目的就是把虚拟页面映射为页框。也表示一个函数，参数是虚拟页号，结果是物理页框号。</p>
+<h4 id="页表项的结构"><a href="#页表项的结构" class="headerlink" title="页表项的结构"></a>页表项的结构</h4><ul>
+<li>页框号</li>
+<li>在/不在 位：如果是1，则表示有效，可以使用。如果是0，则表示该表项对应虚拟页面不在内存中，访问该页面回引起一个缺页中断。</li>
+<li>保护位：一个页允许什么类型的访问，0表示读/写，1表示只读。或者三位，读、写、执行。</li>
+<li>修改位（dirty bit）：如果一个页面被修改过（脏的），就必须把它写回磁盘，如果没被修改过（干净的），那么只需要把页面丢弃就可以了。</li>
+<li>访问位：帮助系统发生缺页中断时候选择要被淘汰的页面。</li>
+<li>禁止位：禁止访问Buffer一类的高速缓存，用于映射到设备寄存器而不是常规内存的页面。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719265238-90e5182c-63ac-4527-8a1a-f91fc3ea010f.png#height=320&amp;width=762" srcset="/img/loading.gif" alt=""> <h3 id="加速分页过程"><a href="#加速分页过程" class="headerlink" title="加速分页过程"></a>加速分页过程</h3>要解决的问题：</li>
+</ul>
+<ol>
+<li>虚拟地址到物理地址的映射要快</li>
+<li>如果虚拟地址空间很大，页表也会很大</li>
+</ol>
+<h4 id="转换检测缓冲区"><a href="#转换检测缓冲区" class="headerlink" title="转换检测缓冲区"></a>转换检测缓冲区</h4><p>设置一个小型硬件，叫<strong>转换检测缓冲区</strong>（Translation Lookaside Buffer，TLB），通常在MMU中，包含少量表项。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719265539-43413943-736a-4d0d-a1b0-daa25d85ab6e.png#height=438&amp;width=752" srcset="/img/loading.gif" alt=""><br>如果发现有效匹配，并且访问操作<strong>不违反保护位</strong>，则将页框号从TLB中取出，而不必再访问页表。如果虚拟页面号在TLB中，但指令读写不符合保护位，就会产生保护错误。<br>如果虚拟页号不在TLB中，就正常页表查询，接着从TLB中淘汰一个表项，用新的页表项代替它。<br>当表项被清除出TLB时，将修改为复制到内存中的页表项。</p>
+<h4 id="软件TLB管理"><a href="#软件TLB管理" class="headerlink" title="软件TLB管理"></a>软件TLB管理</h4><p>用软件管理TLB，高效，加速。</p>
+<ol>
+<li>软失效：一个页面访问在内存中，不在TLB中。要更新一下TLB，不需要I/O</li>
+<li>硬失效：页面本身不在内存中（当然不在TLB中），要进行一次磁盘I/O，装入页面。<h3 id="针对大内存的页表"><a href="#针对大内存的页表" class="headerlink" title="针对大内存的页表"></a>针对大内存的页表</h3><h4 id="多级页表"><a href="#多级页表" class="headerlink" title="多级页表"></a>多级页表</h4><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719265966-b1a18b94-bfa6-4fa5-9ff7-35e4dd9cc515.png#height=792&amp;width=752" srcset="/img/loading.gif" alt=""><br>32位地址：前10 是页表1，中间10 是页表2，最后12是偏移量<br>避免把全部页表一直保存在内存中<br>索引顶级页表→二级页表<h4 id="倒排页表（64位机）"><a href="#倒排页表（64位机）" class="headerlink" title="倒排页表（64位机）"></a>倒排页表（64位机）</h4>实际内存中每个页框有一个表项，而不是每个虚拟页面有一个表项。<br>缺点：从虚拟地址到物理地址转换必须搜索整个倒排页表来查找某个表项</li>
+</ol>
+<h3 id="局部性原理"><a href="#局部性原理" class="headerlink" title="局部性原理"></a>局部性原理</h3><p><strong>局部性原理：CPU访问存储器时，无论是存取指令还是存取数据，所访问的存储单元都区域聚集在一个较小的连续区域中。</strong></p>
+<ul>
+<li>时间局部性：如果一个信息项正在被访问，那么在<strong>近期</strong>它可能还会被<strong>再次访问</strong></li>
+<li>空间局部性：在<strong>最近的将来</strong>将用到的信息很可能与现在正在使用的信息在空间地址上是<strong>邻近的</strong><h3 id="写时拷贝（Copy-on-Write）"><a href="#写时拷贝（Copy-on-Write）" class="headerlink" title="写时拷贝（Copy on Write）"></a>写时拷贝（Copy on Write）</h3>两个进程同时指向一个页面，当一个进程对页面A进行写操作，导致页面A变化时，创建一个A的副本。</li>
+</ul>
+<p>该技术提供了快速的进程创建，并最小化了必须分配被新创建进程页面的数量。<br>这些共享页面被标记为“写时拷贝”页面，意味着如果其中一个段进程堆共享页面进行了写操作，那么将创建一个共享页面的拷贝。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719266247-46849b1f-a963-4495-bac9-3ab509e33488.png#height=318&amp;width=788" srcset="/img/loading.gif" alt=""><br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719266543-9fc77be4-ffa0-41be-9e22-1a1f82ccd75d.png#height=422&amp;width=788" srcset="/img/loading.gif" alt=""> </p>
+<h2 id="分段"><a href="#分段" class="headerlink" title="分段"></a>分段</h2><p>虚拟内存是一维的<br>分段是二维的：段号+段内地址<br>分段存储的产生：分页一维，表随着编译不断增长，只能被分配到连续的块中。<br>每个段由一个从0到最大的线性地址序列构成<br>各个段的长度可以是0到某个允许的最大值之间的任何一个值<br>不同的段的长度可以不同，并且可以动态改变。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719266838-d0526017-ea54-4cdb-9af1-eaac46f134a9.png#height=462&amp;width=734" srcset="/img/loading.gif" alt=""><br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719267173-fe4abda9-5610-4ee0-90e4-74acd7be881d.png#height=648&amp;width=732" srcset="/img/loading.gif" alt=""> </p>
+<h3 id="纯分段实现"><a href="#纯分段实现" class="headerlink" title="纯分段实现"></a>纯分段实现</h3><p>页是定长的，段不是定长的<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719267432-0ed44c02-b88d-42d6-a926-fe56e9c2b33a.png#height=396&amp;width=684" srcset="/img/loading.gif" alt=""><br>这里面的碎片叫外部碎片or棋盘型碎片</p>
+<h4 id="段表"><a href="#段表" class="headerlink" title="段表"></a>段表</h4><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">段号</th>
+<th style="text-align:center"><strong>段长</strong></th>
+<th style="text-align:center">基址</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>段表记录了内存中的起始位置，各个段的段表项的长度相同。</p>
+<h3 id="分段分页结合：MULTICS"><a href="#分段分页结合：MULTICS" class="headerlink" title="分段分页结合：MULTICS"></a>分段分页结合：MULTICS</h3><p>分页、分段</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">优点</th>
+<th style="text-align:center">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">分页</td>
+<td style="text-align:center">内存利用率高，不会产生外部碎片</td>
+<td style="text-align:center">不方便按照逻辑模块实现信息的共享和保护</td>
+</tr>
+<tr>
+<td style="text-align:center">分段</td>
+<td style="text-align:center">很方便按照逻辑模块实现信息共享和保护</td>
+<td style="text-align:center">如果段长过大，为其分配很大连续空间不方便。同时会产生外部碎片。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>逻辑地址结构：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">段号</th>
+<th style="text-align:center">页号</th>
+<th style="text-align:center">页内偏移量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>段表</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">段号</th>
+<th style="text-align:center">页表长度</th>
+<th style="text-align:center">页表存放地址</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>把段分页的操作是由操作系统完成的，对用户不可见。<br>一个进程→一个段表→多个页表<br><strong>3次访问内存</strong></p>
+<ol>
+<li>访问段表</li>
+<li>访问页表</li>
+<li>访问对应物理单元<br>如果有快表（TLB）命中，就一次访存</li>
+</ol>
+<h2 id="页面置换算法"><a href="#页面置换算法" class="headerlink" title="页面置换算法"></a>页面置换算法</h2><h3 id="最优页面置换算法（Optimal-Replacement-Algorithm）"><a href="#最优页面置换算法（Optimal-Replacement-Algorithm）" class="headerlink" title="最优页面置换算法（Optimal Replacement Algorithm）"></a>最优页面置换算法（Optimal Replacement Algorithm）</h3><p>替换掉<strong>最远会被访问的页面</strong>（最近最不会被访问的页面）</p>
+<p>问题在于这个算法<strong>实现不了</strong>，因为不知道未来哪个页面会被访问。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719267651-74fda957-6770-4c65-9acf-056a49148998.png#height=236&amp;width=812" srcset="/img/loading.gif" alt=""> </p>
+<h3 id="先进先出页面置换算法（FIFO-Replacement-Algorithm）"><a href="#先进先出页面置换算法（FIFO-Replacement-Algorithm）" class="headerlink" title="先进先出页面置换算法（FIFO Replacement Algorithm）"></a>先进先出页面置换算法（FIFO Replacement Algorithm）</h3><p>替换掉<strong>最先读入</strong>内存的页<br>是最简单的页面置换算法<br>表现并不是一直很好<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719267857-c73238aa-e050-4282-b60f-2ce7a9a77505.png#height=226&amp;width=816" srcset="/img/loading.gif" alt=""> </p>
+<h3 id="第二次机会页面置换算法（Second-Chance-Replacement-Algorithm）"><a href="#第二次机会页面置换算法（Second-Chance-Replacement-Algorithm）" class="headerlink" title="第二次机会页面置换算法（Second Chance Replacement Algorithm）"></a>第二次机会页面置换算法（Second Chance Replacement Algorithm）</h3><p>在FIFO基础上做一点点修改。<br>检查最老页面的R位</p>
+<ul>
+<li>如果R位是0，那么这个页面又老又没用，就替换出去。</li>
+<li>如果R位是1，就把R清0，并把这个页面放到链表的尾部（假装变成最近装入的页面），然后继续搜索<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719268083-c14af98f-3f87-46ac-9688-0956128a627c.png#height=336&amp;width=820" srcset="/img/loading.gif" alt=""><br>这里页面上的数字是被装入的时间<h3 id="时钟页面置换算法（Simple-Clock-Page-Replacement-Algorithm）"><a href="#时钟页面置换算法（Simple-Clock-Page-Replacement-Algorithm）" class="headerlink" title="时钟页面置换算法（Simple Clock Page Replacement Algorithm）"></a>时钟页面置换算法（Simple Clock Page Replacement Algorithm）</h3>第二次机会算法经常要在链表中移动页面，这样既<strong>降低了效率</strong>又没必要，所以把所有页面保存在一个类似钟面的环形链表中，一个表针总是指向最老的页面。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719268300-32c7863e-53d8-4f5a-97db-66a878ba4d01.png#height=370&amp;width=542" srcset="/img/loading.gif" alt=""><br>发生缺页中断时，如果R位是0，就置换新的页面，并且<strong>表针前移一个位置</strong>，如果R位是1，就清除R，并把表针前移一个位置。<h3 id="最近最少使用页面置换算法（Least-Recently-Used-Replacement-Algorithm）"><a href="#最近最少使用页面置换算法（Least-Recently-Used-Replacement-Algorithm）" class="headerlink" title="最近最少使用页面置换算法（Least Recently Used Replacement Algorithm）"></a>最近最少使用页面置换算法（Least Recently Used Replacement Algorithm）</h3>Least Recently Used（LRU）：最近久未使用<br>在缺页中断发生时，置换未使 用时间最长的页面<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719268483-f9fcf6d5-e8de-4eae-b1e6-38d37b99fec5.png#height=220&amp;width=816" srcset="/img/loading.gif" alt=""> </li>
+</ul>
+<h4 id="LRU算法的实现"><a href="#LRU算法的实现" class="headerlink" title="LRU算法的实现"></a>LRU算法的实现</h4><ol>
+<li>需要维护一个链表，最近最多使用的页面在表头，最近最少使用的页面在表尾。但是链表需要在每次发生内存读取的时候更新一次。</li>
+<li>64位计数器C：每条指令执行完后自动+1，每个页表项必须有一个容纳这个计数器值的域，每次访问内存后，将C的值保存到被访问页面的页表项中，发生缺页中断，操作系统就检查所有页表项中计数器的值，找到值最小的页面。</li>
+<li>n×n位矩阵：当访问页框k时，把k行的位都置1，然后把k列位都置0。在任何时刻，二进制数值最小的行，就是最近最少使用的。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719268761-5267fefc-5df0-449f-b67f-5bec8c901571.png#height=490&amp;width=696" srcset="/img/loading.gif" alt=""> <h4 id="LRU栈置换"><a href="#LRU栈置换" class="headerlink" title="LRU栈置换"></a>LRU栈置换</h4>每当一个页面被访问，就把他从栈中删除，然后加在栈顶。<br>这样在栈顶的就是最近最常被访问的，而在栈底的就是最近最少访问的页框。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719268971-ec6f1c3c-865d-4850-98cc-a128dad1564a.png#height=348&amp;width=522" srcset="/img/loading.gif" alt=""> <h3 id="最不常用页面置换算法（Not-Frequently-Used-Replacement-Algorithm）"><a href="#最不常用页面置换算法（Not-Frequently-Used-Replacement-Algorithm）" class="headerlink" title="最不常用页面置换算法（Not Frequently Used Replacement Algorithm）"></a>最不常用页面置换算法（Not Frequently Used Replacement Algorithm）</h3><h4 id="软件模拟LRU"><a href="#软件模拟LRU" class="headerlink" title="软件模拟LRU"></a>软件模拟LRU</h4>NFU（Not Frequently Used，最不常用）算法，每个页面有一个计数器，每次时钟中断时，由操作系统扫描内存中的所有页面，将每个页面的R位（0/1）加到计数器上。发生缺页中断时，置换计数器值最小的页面。<br>但是该算法不会忘记信息，比如在1时刻经常使用，后来不常使用，但仍然不被替换出去。<h3 id="老化算法（Aging-Algorithm）"><a href="#老化算法（Aging-Algorithm）" class="headerlink" title="老化算法（Aging Algorithm）"></a>老化算法（Aging Algorithm）</h3>修改NFU：</li>
+<li>在R位被加进之前，先将计数器右移一位</li>
+<li>将R位加到计数器最左端的位而不是最右端的位<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719269243-74d19a98-fa24-4ac9-a256-73d268682f88.png#height=510&amp;width=730" srcset="/img/loading.gif" alt=""> <h3 id="最少使用置换算法（Least-Frequently-Used）"><a href="#最少使用置换算法（Least-Frequently-Used）" class="headerlink" title="最少使用置换算法（Least Frequently Used）"></a>最少使用置换算法（Least Frequently Used）</h3>淘汰最近访问频率最小的元素<br>好像就是老化算法…<br>不对，它是各个位加起来，不是二进制串的最大值<br>意思是：00011111，要比10000000大。<h3 id="最近未使用页面置换算法（Not-Recently-Used-Replacement-Algorithm）"><a href="#最近未使用页面置换算法（Not-Recently-Used-Replacement-Algorithm）" class="headerlink" title="最近未使用页面置换算法（Not Recently Used Replacement Algorithm）"></a>最近未使用页面置换算法（Not Recently Used Replacement Algorithm）</h3>改进版的Second-Change Algorithm<br>由两个位（Read，Modify）</li>
+</ol>
+<ul>
+<li><ol>
+<li>（0，0）：没有被访问，没有被修改</li>
+</ol>
+</li>
+<li><ol>
+<li>（0，1）：没有被访问，已经被修改</li>
+</ol>
+</li>
+<li><ol>
+<li>（1，0）：已经被访问，没有被修改</li>
+</ol>
+</li>
+<li><ol>
+<li>（1，1）：已经被访问，已经被修改</li>
+</ol>
+</li>
+</ul>
+<p>第1类是第3类R位清零后的结果</p>
+<p>R位被定期清零（比如每次时钟中断）<br>随机选择一个编号最小的非空类中的页面淘汰<br>算法思想：在最近一个时钟中，<strong>淘汰一个没有被访问的已修改页面要比淘汰一个被频繁使用的“干净”页面好</strong></p>
+<h3 id="页面缓冲算法（Page-Buffering-Algorithm）"><a href="#页面缓冲算法（Page-Buffering-Algorithm）" class="headerlink" title="页面缓冲算法（Page-Buffering Algorithm）"></a>页面缓冲算法（Page-Buffering Algorithm）</h3><p>？？？</p>
+<h3 id="工作集页面置换算法"><a href="#工作集页面置换算法" class="headerlink" title="工作集页面置换算法"></a>工作集页面置换算法</h3><p>工作集：一个进程当前正在使用的页面的集合就称为工作集。<br>如果整个工作集都在内存中，程序知道运行到下一个执行阶段才会发生中断。<br>抖动（thrashing）：如果每执行几条指令程序就发生一次缺页中断，那么就称这个程序发生了抖动/颠簸。<br>工作集模型：设法跟踪进程的工作集，以确保在让进程运行以前，它的工作集就已在内存中了<br>预先调页（prepaging）：让进程预先装入其工作集页面<br>工作集：w（k，t）k=最近k次内存访问访问过的页面，t=在任意t时刻。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719269511-59e65ddb-8bee-4b02-8a39-6f8c9e6feef4.png#height=420&amp;width=792" srcset="/img/loading.gif" alt=""></p>
+<p>算法思路：找出一个不在工作集中的页面并淘汰它。<br>需要两条信息：<strong>上次使用该页面的近似时间、R位</strong><br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719269793-e137e0e6-6307-4b7b-9681-22e2b4e941a5.png#height=496&amp;width=792" srcset="/img/loading.gif" alt=""><br>扫描页面检查R位</p>
+<ol>
+<li>若R==1，设置上次使用时间为当前实际时间</li>
+<li>若R==0 &amp;&amp; 生存时间 &gt; τ，移出这个页面</li>
+<li>若R==0 &amp;&amp; 生存时间 ≤ τ，记住最小时间（生存时间最长的时间）</li>
+</ol>
+<p>如果扫描完仍然没有空位，就淘汰生存时间最长的页面。</p>
+<h3 id="工作集时钟页面置换算法"><a href="#工作集时钟页面置换算法" class="headerlink" title="工作集时钟页面置换算法"></a>工作集时钟页面置换算法</h3><p>WSClock：实现简单，性能较好<br>和Clock一样，是一个页框为元素的循环表<br>表项有：上次使用时间、R位、M位<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719270132-292e1f21-af3d-4f4b-a428-86c6efc4f72a.png#height=694&amp;width=648" srcset="/img/loading.gif" alt=""> </p>
+<p>缺页中断 发生，检查指针指向页面</p>
+<ul>
+<li>如果R位是1，则置0，指向下一个元素</li>
+<li>如果R位是0，且页面生存时间＞τ，且页面干净，则不在工作集中，置换该页面。如果页面被修改过（脏的），就不能立即置换，指针继续前进，检查下一个。</li>
+</ul>
+<h3 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h3><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719270365-4b77e693-2b9e-4c4c-a96e-688c9eff3b74.png#height=316&amp;width=648" srcset="/img/loading.gif" alt=""><br>最好的两个是：老化算法、工作集时钟算法</p>
+<h3 id="Stack-Algorithm——栈式算法"><a href="#Stack-Algorithm——栈式算法" class="headerlink" title="Stack Algorithm——栈式算法"></a>Stack Algorithm——栈式算法</h3><h4 id="Belady’s-Anomaly"><a href="#Belady’s-Anomaly" class="headerlink" title="Belady’s Anomaly"></a>Belady’s Anomaly</h4><p>对于某些页面置换算法，页框增加，缺页中断次数反而增加<br>FIFO会出现，内存越大，反而发生缺页中断的次数变多的情况<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719270557-a913719d-d38f-48cc-b4d8-5adab39944eb.png#height=208&amp;width=738" srcset="/img/loading.gif" alt=""><br>如果内存中<strong>页数更小的集合是内存页数更大的集合的子集</strong>，这个算法被称为stack algorithm。可以证明stack algorithm(如LRU)不会出现belady现象，FIFO会出现。</p>
+<p>Stack Algorithm<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719270703-3947950f-7d14-45a3-946b-44a4baf7e1a7.png#height=172&amp;width=438" srcset="/img/loading.gif" alt=""> </p>
+<h4 id="Distance-Strings"><a href="#Distance-Strings" class="headerlink" title="Distance Strings"></a>Distance Strings</h4><p>距离字符串，描述同一个页面两次访问操作的距离（即上次访问后的几次页的访问再次访问同一页）<br>Depends on：</p>
+<ul>
+<li>Reference String</li>
+<li>Page Replacement Algorithms</li>
+<li>To forecast page fault rate in different memory sizes<h3 id="Predicting-Page-Fault-Rates"><a href="#Predicting-Page-Fault-Rates" class="headerlink" title="Predicting Page Fault Rates"></a>Predicting Page Fault Rates</h3><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719270991-93672e3a-0134-49aa-8063-cf2cf69db2f0.png#height=550&amp;width=796" srcset="/img/loading.gif" alt=""> </li>
+</ul>
+<h2 id="Design-Issues-for-Paging-Systems"><a href="#Design-Issues-for-Paging-Systems" class="headerlink" title="Design Issues for Paging Systems"></a>Design Issues for Paging Systems</h2><h3 id="局部分配策略与全局分配策略"><a href="#局部分配策略与全局分配策略" class="headerlink" title="局部分配策略与全局分配策略"></a>局部分配策略与全局分配策略</h3><ul>
+<li>局部页面置换算法：有效地为每个进程分配固定的内存片段</li>
+<li>全局页面置换算法：全局算法在可运行进程之间动态地分配页框，因此分配给各个进程的页框数是随时间变化的<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719271218-c0c57ca7-72ec-422e-8f3c-d3c82c9999d7.png#height=372&amp;width=612" srcset="/img/loading.gif" alt=""> </li>
+</ul>
+<p>使用PFF缺页中断率算法，指出何时增加or减少分配给一个进程的页面，但是没说应该替换哪个页面，只是说分配集的大小。<br>缺页中断率：计算每秒的缺页中断数。<br>FIFO、LRU，既适应局部置换算法，也可以全局置换算法。</p>
+<h3 id="Thrashing-抖动"><a href="#Thrashing-抖动" class="headerlink" title="Thrashing 抖动"></a>Thrashing 抖动</h3><p>每次发生缺页中断，就说是一次抖动/颠簸<br>交换 进出<br>高频页面活动也是抖动<br>如果进程换页的时间比执行时间占比高，就是进程抖动</p>
+<h4 id="发生原因"><a href="#发生原因" class="headerlink" title="发生原因"></a>发生原因</h4><ol>
+<li>多进程<br>全局页面置换算法<br>循环从另一个过程中获取页框<br>进程换页的时间比执行时间占比高，就是抖动</li>
+<li><p>操作系统监视CPU使用率，如果CPU利用率过低，就让多进程执行多一些<br>使用全局置换算法，不考虑这些也属于哪个进程<br>现在假设进程进入新的执行阶段，并且需要更多页框</p>
+<ul>
+<li>开始缺页中断，抢夺其他进程需要使用的页框。那些进程页缺页中断，继续抢夺其他进程的页框。</li>
+<li><p>这些缺页中断的进程需要使用分页设备来换入换出页，那分页设备队列执行，准备队列就空了</p>
+<p>当进程等待分页设备执行，CPU利用率就低了，回到开始，再次循环。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719271405-bbf1dfa6-ad78-4889-b3a4-897a7a307650.png#height=282&amp;width=486" srcset="/img/loading.gif" alt=""> </p>
+<h4 id="防止抖动措施"><a href="#防止抖动措施" class="headerlink" title="防止抖动措施"></a>防止抖动措施</h4><p>使用局部置换算法（或优先级置换算法）<br>工作集模型（工作集窗口）<br>$L=S$；</p>
+</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>L：平均缺页中断频率</li>
+<li>S：平均缺页中断不止次数</li>
+<li>CPU：最佳利用率</li>
+</ul>
+<p>L 大于 S，很少缺页，磁盘能力没有被充分利用。<br>L 小于 S，频繁缺页，超过磁盘的处理能力。<br>挂起一些进程</p>
+<h3 id="Load-Control-负载控制"><a href="#Load-Control-负载控制" class="headerlink" title="Load Control 负载控制"></a>Load Control 负载控制</h3><p>总会发生抖动<br>唯一的解决方案就是：暂时从内存中去掉一些进程</p>
+<h3 id="Page-Size-页面大小"><a href="#Page-Size-页面大小" class="headerlink" title="Page Size 页面大小"></a>Page Size 页面大小</h3><p>页面大小是操作系统可以选择的参数<br>选择小页面<br>好处：</p>
+<ul>
+<li>减少内部碎片</li>
+<li>更好适应多样的数据结构，代码块</li>
+<li>减少内存中没用的程序<br>坏处：</li>
+<li>更大的页表，程序需要更多页面</li>
+</ul>
+<p>进程平均大小s个字节，页面大小p个字节，每个页表需要e个字节。<br>开销=se/p+p/2<br>最优页面大小公式：$P=\sqrt{2se}$</p>
+<h3 id="分离指令空间和数据空间"><a href="#分离指令空间和数据空间" class="headerlink" title="分离指令空间和数据空间"></a>分离指令空间和数据空间</h3><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719271835-cca332b1-6012-4cc2-9eb0-3d0da3098261.png#height=334&amp;width=708" srcset="/img/loading.gif" alt=""> </p>
+<h3 id="共享页面"><a href="#共享页面" class="headerlink" title="共享页面"></a>共享页面</h3><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719272147-80443b03-cd5f-41ec-96b4-3d18389cf6ae.png#height=606&amp;width=684" srcset="/img/loading.gif" alt=""> </p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-Operating-System/">操作系统(Operating System)</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Operating-System/">Operating System</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/02/03/OS-Chapter-8-I-O-Management/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">OS Chapter 8 I/O Management</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/02/03/OS-Chapter-6-File-System/">
+                        <span class="hidden-mobile">OS Chapter 6 File System</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <script type="text/javascript">
+    function loadUtterances() {
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.defer = false
+      s.setAttribute('repo', 'Azerrroth/comments-utterances');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('theme', 'github-light');
+      s.setAttribute('crossorigin', 'anonymous');
+      var e = document.getElementsByTagName('script')[0];
+      e.parentNode.insertBefore(s, e);
+    }
+    createObserver(loadUtterances, 'comments')
+  </script>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "OS Chapter 7 Memory Management&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "false",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#561f55">
+  <meta name="description" content="">
+  <meta name="author" content="Azerrroth">
+  <meta name="keywords" content="">
+  <title>OS Chapter 4 Process Thread Scheduling ~ Codeless</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Codeless</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/Background/earth.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2020-02-03 16:15">
+      February 3, 2020 pm
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      21
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="CPU调度概念"><a href="#CPU调度概念" class="headerlink" title="CPU调度概念"></a>CPU调度概念</h2><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717521370-85379e88-bf72-4040-950c-be70bba3611f.png#height=486&amp;width=1162" srcset="/img/loading.gif" alt=""> </p>
+<h3 id="调度的三个层次"><a href="#调度的三个层次" class="headerlink" title="调度的三个层次"></a>调度的三个层次</h3><ul>
+<li>高级调度（作业调度 Long-term schedule）：外存→内存，面向作业<ul>
+<li>从后备队列选择合适的作业调入内存</li>
+<li>无→创建态→就绪态</li>
+<li>发生频率最低</li>
+</ul>
+</li>
+<li>中级调度（内存调度 Middle-term schedule）：外存→内存，面向进程<ul>
+<li>从挂起队列选择合适进程将其数据调回内存</li>
+<li>挂起态→就绪态、阻塞挂起→阻塞态</li>
+<li>发生频率中等</li>
+</ul>
+</li>
+<li>低级调度（进程调度 Short-term schedule）：内存→CPU<ul>
+<li>从就绪队列选择一个进程为其分配处理机</li>
+<li>就绪态→运行态</li>
+<li>发生频率最高<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717521740-756446dd-e8a6-47fc-8515-cc1186c3e306.png#height=428&amp;width=844" srcset="/img/loading.gif" alt=""><br>计算密集型（compute-bound）<br>I/O密集型（I/O-bound）</li>
+</ul>
+</li>
+</ul>
+<h2 id="进程调度"><a href="#进程调度" class="headerlink" title="进程调度"></a>进程调度</h2><h3 id="进程调度的时机："><a href="#进程调度的时机：" class="headerlink" title="进程调度的时机："></a>进程调度的时机：</h3><ul>
+<li>当前进程主动放弃CPU<ul>
+<li>进程正常终止</li>
+<li>运行过程中发生异常而终止</li>
+<li>进程主动请求阻塞（等待I/O）</li>
+</ul>
+</li>
+<li>当前进程被动放弃CPU<ul>
+<li>分给进程的时间片用完了</li>
+<li>有更紧急的事需要处理（如I/O中断）</li>
+<li>有更高优先级的进程进入就绪队列<h3 id="什么时候不能进程调度："><a href="#什么时候不能进程调度：" class="headerlink" title="什么时候不能进程调度："></a>什么时候不能进程调度：</h3>在处理中断过程中<br>进程在操作系统<strong>内核程序临界区</strong>中（普通的临界区是可以的，如打印机）<br>原子操作过程中（<strong>原语</strong>）</li>
+</ul>
+</li>
+</ul>
+<h3 id="进程调度的方式"><a href="#进程调度的方式" class="headerlink" title="进程调度的方式"></a>进程调度的方式</h3><ul>
+<li>非抢占式：只允许进程主动放弃CPU</li>
+<li>抢占式：可以由操作系统剥夺当前进程CPU控制权<ul>
+<li>当一个进程在CPU执行时，有更重要、更紧迫的进程需要使用CPU，则立即暂停当前进程，将CPU分配给更紧迫的那个进程。<code>// 适用于分时操作系统、实时操作系统</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="进程的切换与过程"><a href="#进程的切换与过程" class="headerlink" title="进程的切换与过程"></a>进程的切换与过程</h3><ul>
+<li>狭义进程调度：从就绪队列选中一个要运行的进程。</li>
+<li>进程切换：指一个进程让出CPU，让给另一个进程的过程。<ol>
+<li>对原来运行进程数据保存</li>
+<li>新进程数据恢复（程序计数器、程序状态字、数据寄存器等，存放在PCB）</li>
+</ol>
+</li>
+<li>广义进程调度：选择+进程切换</li>
+</ul>
+<h2 id="CPU调度算法评价指标"><a href="#CPU调度算法评价指标" class="headerlink" title="CPU调度算法评价指标"></a>CPU调度算法评价指标</h2><h3 id="CPU利用率"><a href="#CPU利用率" class="headerlink" title="CPU利用率"></a>CPU利用率</h3><p>$利用率=\frac{忙碌时间}{总时间}$<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717522091-2ae9445b-6f07-47e4-a0d9-5e6f94f175d8.png#height=276&amp;width=842" srcset="/img/loading.gif" alt=""> </p>
+<h3 id="系统吞吐量"><a href="#系统吞吐量" class="headerlink" title="系统吞吐量"></a>系统吞吐量</h3><p>$系统吞吐量=\frac{总共完成了多少作业}{总共花费的时间}$<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717522366-55b553cd-4479-4a4c-bea1-4fcb2f011f25.png#height=112&amp;width=834" srcset="/img/loading.gif" alt=""> </p>
+<h3 id="周转时间"><a href="#周转时间" class="headerlink" title="周转时间"></a>周转时间</h3><p>作业被提交给系统开始，到作业完成为止的时间间隔。<br>包括四部分：</p>
+<ul>
+<li>作业在外存后备队列等待作业调度时间</li>
+<li>进程在就绪队列等待进程调度的时间</li>
+<li>进程在CPU上执行时间</li>
+<li>进程等待I/O操作完成时间</li>
+</ul>
+<script type="math/tex; mode=display">周转时间=作业完成时间-作业提交时间</script><script type="math/tex; mode=display">平均周转时间=\frac{各作业周转时间之和}{作业数}</script><script type="math/tex; mode=display">带权周转时间=\frac{作业周转时间}{作业实际运行时间}=\frac{作业完成时间-作业提交时间}{作业实际运行时间}</script><script type="math/tex; mode=display">平均带权周转时间=\frac{各作业带权周转时间之和}{作业数}</script><h3 id="等待时间"><a href="#等待时间" class="headerlink" title="等待时间"></a>等待时间</h3><p>进程/作业处于等待CPU状态时间之和<br>进程：进程建立后等待被服务的时间之和<br>作业：建立进程后的等待时间 + 作业在外存后备队列中等待的时间</p>
+<h3 id="响应时间"><a href="#响应时间" class="headerlink" title="响应时间"></a>响应时间</h3><p>用户提交请求到首次产生响应所用的时间</p>
+<h2 id="调度算法"><a href="#调度算法" class="headerlink" title="调度算法"></a>调度算法</h2><h3 id="批处理系统-Batch-System"><a href="#批处理系统-Batch-System" class="headerlink" title="批处理系统 Batch System"></a>批处理系统 Batch System</h3><h4 id="先来先服务-FCFS，First-Come-First-Serve"><a href="#先来先服务-FCFS，First-Come-First-Serve" class="headerlink" title="先来先服务 FCFS，First Come First Serve"></a>先来先服务 FCFS，First Come First Serve</h4><p>进程按照请求CPU顺序使用CPU<br>用于作业调度，考虑哪个作业先到达后备队列；用于进程调度，考虑哪个进程先到达就绪队列<br>非抢占式算法<br>优点：公平、算法实现简单<br>缺点：对长作业有利，对短作业不利</p>
+<h4 id="短作业优先（SJF，Shortest-Job-First）"><a href="#短作业优先（SJF，Shortest-Job-First）" class="headerlink" title="短作业优先（SJF，Shortest Job First）"></a>短作业优先（SJF，Shortest Job First）</h4><p>追求最少的平均等待时间，最少的平均周转时间，最少的平均带权周转时间<br>最短的作业时间，优先被得到服务。按照到达的进程/作业，最短运行的先服务。<br>非抢占式<br>抢占式（最短剩余时间优先算法）<br>优点：最短平均等待时间、平均周转时间<br>缺点：不公平，对短作业有利，长作业不利，可能<strong>产生饥饿</strong>现象</p>
+<h4 id="最短剩余时间优先算法（SRTN，Shortest-Remain-Time-Next）"><a href="#最短剩余时间优先算法（SRTN，Shortest-Remain-Time-Next）" class="headerlink" title="最短剩余时间优先算法（SRTN，Shortest Remain Time Next）"></a>最短剩余时间优先算法（SRTN，Shortest Remain Time Next）</h4><p>得到<strong>平均等待时间、平均周转时间</strong>最少<br>就是<strong>抢占式的短作业优先</strong></p>
+<h4 id="高响应比优先（HRRN，Highest-Response-Ratio-Next）"><a href="#高响应比优先（HRRN，Highest-Response-Ratio-Next）" class="headerlink" title="高响应比优先（HRRN，Highest Response Ratio Next）"></a>高响应比优先（HRRN，Highest Response Ratio Next）</h4><p>$响应比=\frac{等待时间+要求服务时间}{要求服务时间}$<br>每次调度先计算各个作业/进程的响应比，选择响应比最高的作业/进程为其服务<br>非抢占式算法<br>优点：综合考虑等待时间和运行时间<br>缺点：没有缺点</p>
+<h3 id="交互式系统-Interactive-System"><a href="#交互式系统-Interactive-System" class="headerlink" title="交互式系统 Interactive System"></a>交互式系统 Interactive System</h3><h4 id="时间片轮转（Round-Robin）用于分时操作系统"><a href="#时间片轮转（Round-Robin）用于分时操作系统" class="headerlink" title="时间片轮转（Round-Robin）用于分时操作系统"></a>时间片轮转（Round-Robin）用于分时操作系统</h4><p>算法思想：<strong>公平</strong>、轮流为各个进程服务<br>算法规则：按照各进程到达就绪队列顺序，轮流让进程执行一个时间片（如100ms），若进程未在时间片内执行完，就剥夺CPU，将进程<strong>重新放入就绪队列队尾</strong><br>用于进程调度<br>抢占式算法，由时钟装置发出时钟中断来通知CPU<br>如果时间片太大，就会增大进程响应时间，退化为先来先服务调度算法<br>如果时间片太小，进程切换过于频繁，就会<strong>花费大量时间处理切换</strong>，导致实际执行时间比例减少。</p>
+<p>优点：公平，响应快，适用于分时操作系统<br>缺点：高频率进程切换，有一定开销，不区分任务紧急程度</p>
+<h4 id="优先级调度算法（Priority-Scheduling）"><a href="#优先级调度算法（Priority-Scheduling）" class="headerlink" title="优先级调度算法（Priority Scheduling）"></a>优先级调度算法（Priority Scheduling）</h4><p>思想：场景需要根据任务紧急程度决定处理顺序<br>规则：每个作业/进程有各自的优先级，<strong>调度时选择优先级最高的</strong>。优先级一样，处理<strong>先到达的</strong><br>既能作业调度，也能进程调度<br>抢占式、非抢占式都有<br>静态优先级：创建进程确定，之后一直不变<br>动态优先级：创建进程有一个初始值，之后动态调整<br>系统进程优先级高于用户进程<br>前台进程优先级高于后台进程<br>操作系统偏好I/O型进程（对整体利用率、吞吐量有提升）<br>动态调整：追求公平、提升资源利用率、频繁IO操作提升优先级<br>优点：优先级区分紧急程度、重要程度，适用于实时操作系统<br>缺点：如果源源不断高优先级，就会<strong>导致饥饿</strong></p>
+<h4 id="多级反馈队列调度算法（Multi-level-Feedback-queue-scheduling）"><a href="#多级反馈队列调度算法（Multi-level-Feedback-queue-scheduling）" class="headerlink" title="多级反馈队列调度算法（Multi-level Feedback queue scheduling）"></a>多级反馈队列调度算法（Multi-level Feedback queue scheduling）</h4><p>思想：前两种的折中<br>规则：</p>
+<ol>
+<li>设置多级就绪队列，各级队列优先级从高到低，时间片从小到大</li>
+<li>新进程到达进入一级队列，运行时间片用完（时间片没用完被抢占，就返回当前级队列）程序还未结束，放入下一级队列（当处于最后一级队列的时候，重新回到最后一级队列）</li>
+<li>只有第k级队列为空，才会为k+1级队头分配时间片</li>
+</ol>
+<p>抢占式算法<br>优点：公平，每个进程都能得到快速响应，短进程经历较少时间就能完成，不必实现估计进程的运行时间，可以灵活调整对各类进程的偏好程度（I/O密集型进程偏好，可以放入当前优先级队列）<br>可能<strong>会导致饥饿</strong></p>
+<h4 id="彩票调度（Lottery-Scheduling）"><a href="#彩票调度（Lottery-Scheduling）" class="headerlink" title="彩票调度（Lottery Scheduling）"></a>彩票调度（Lottery Scheduling）</h4><p>按比例分配给进程彩票，然后抽奖，抽中彩票的就给分配一个时间片。</p>
+<h4 id="More："><a href="#More：" class="headerlink" title="More："></a>More：</h4><p>Guarantee Scheduling<br>Fair-Share Scheduling</p>
+<h3 id="RealTime-System-实时系统"><a href="#RealTime-System-实时系统" class="headerlink" title="RealTime System 实时系统"></a>RealTime System 实时系统</h3><p>实时系统：时间起主导的系统，要求计算机必须在一个确定的时间范围内作出反应<br>Minimizing Latency<br>Priority-Based Scheduling<br>Rate-Monotonic Scheduling<br>Earliest-Deadline-First Scheduling</p>
+<h2 id="线程调度"><a href="#线程调度" class="headerlink" title="线程调度"></a>线程调度</h2><p>二级调度</p>
+<ul>
+<li>内核级线程：系统范围竞争，需要完整的机器指令</li>
+<li>用户级线程：用户范围竞争，切换需要少量机器指令</li>
+</ul>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-Operating-System/">操作系统(Operating System)</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Operating-System/">Operating System</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/02/03/OS-Chapter-5-IPC-Deadlock/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">OS Chapter 5 IPC: Deadlock</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/02/03/OS-Chapter-3-Inter-Process-Communication/">
+                        <span class="hidden-mobile">OS Chapter 3 Inter-Process Communication</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <script type="text/javascript">
+    function loadUtterances() {
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.defer = false
+      s.setAttribute('repo', 'Azerrroth/comments-utterances');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('theme', 'github-light');
+      s.setAttribute('crossorigin', 'anonymous');
+      var e = document.getElementsByTagName('script')[0];
+      e.parentNode.insertBefore(s, e);
+    }
+    createObserver(loadUtterances, 'comments')
+  </script>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "OS Chapter 4 Process Thread Scheduling&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "false",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+</body>
+</html>

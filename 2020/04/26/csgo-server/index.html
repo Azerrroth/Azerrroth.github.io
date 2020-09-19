@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#561f55">
+  <meta name="description" content="">
+  <meta name="author" content="Azerrroth">
+  <meta name="keywords" content="">
+  <title>Cent OS 搭建CS:GO 服务器 ~ Codeless</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Codeless</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/Background/earth.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2020-04-26 13:32">
+      April 26, 2020 pm
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.3k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      26
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <p>最近在自己的阿里云服务器上搭建CS:GO服务器，由于每次查找比较复杂，所以在此自己整理总结一个可行的方案。</p>
+<p>主要内容是源自<a href="https://www.jianshu.com/p/b2cde3ba7908" target="_blank" rel="noopener">FisherYung</a>的博客总结，在遵循该博客的指引下顺利搭建了私人CS:GO服务器，在此十分感谢FisherYung！</p>
+<h3 id="服务器选择"><a href="#服务器选择" class="headerlink" title="服务器选择"></a>服务器选择</h3><p>首先说一下服务器的选择问题，我这里使用的是阿里云的<strong>轻量应用服务器</strong>，具体配置为：</p>
+<blockquote>
+<p>1核-2GB内存-5Mbps带宽</p>
+</blockquote>
+<p>这里选用<strong>轻量应用服务器</strong>主要是因为它有<code>5Mbps</code>的带宽，能够满足日常使用的大部分需求了。</p>
+<p>下面正式开始CS:GO私人服务器的搭建。</p>
+<h2 id="安装steamcmd、CSGO-Server"><a href="#安装steamcmd、CSGO-Server" class="headerlink" title="安装steamcmd、CSGO Server"></a>安装steamcmd、CSGO Server</h2><h4 id="首先创建一个用户，用来运行CSGO-Server程序"><a href="#首先创建一个用户，用来运行CSGO-Server程序" class="headerlink" title="首先创建一个用户，用来运行CSGO Server程序"></a>首先创建一个用户，用来运行CSGO Server程序</h4><div class="hljs"><pre><code class="hljs shell">useradd -m steam    // 添加名为steam的用户
+su steam    // 切换到steam用户
+cd ~    // 切换到steam用户的根目录下</code></pre></div>
+<h4 id="创建steamcmd文件夹，下载steamcmd并解压"><a href="#创建steamcmd文件夹，下载steamcmd并解压" class="headerlink" title="创建steamcmd文件夹，下载steamcmd并解压"></a>创建steamcmd文件夹，下载steamcmd并解压</h4><div class="hljs"><pre><code class="hljs shell">mkdir steamcmd    //创建名为steamcmd的文件夹
+cd steamcmd/    // 切换到文件夹目录下
+wget https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz    //下载steamcmd
+tar zxvf steamcmd_linux.tar.gz    // 解压steamcmd
+rm steamcmd_linux.tar.gz    //删除下载的安装包，也可以保留</code></pre></div>
+<h4 id="安装steamcmd运行环境，运行steamcmd并安装CSGO-Server"><a href="#安装steamcmd运行环境，运行steamcmd并安装CSGO-Server" class="headerlink" title="安装steamcmd运行环境，运行steamcmd并安装CSGO Server"></a>安装steamcmd运行环境，运行steamcmd并安装CSGO Server</h4><div class="hljs"><pre><code class="hljs shell">sudo yum install glibc.i686    // 安装steamcmd运行所需的库
+sudo yum install libstdc++.i686    // 有的主机已经安装其他同样效果的依赖，不用多次安装
+./steamcmd.sh</code></pre></div>
+<p>在操作正确的情况下会看到以下结果，就证明steamcmd安装完成了。<br><img src="http://image.sincos.vip/blog/20200427/7cB0p1RkG7Hn.png" srcset="/img/loading.gif" alt="steamcmd成功安装"></p>
+<h4 id="下面在steamcmd中安装CS-GO-Server"><a href="#下面在steamcmd中安装CS-GO-Server" class="headerlink" title="下面在steamcmd中安装CS:GO Server"></a>下面在steamcmd中安装CS:GO Server</h4><p>首先以匿名身份登录steamcmd<br><div class="hljs"><pre><code class="hljs shell">login anonymous</code></pre></div></p>
+<p>然后创建CS:GO服务器文件夹，该文件夹在steamcmd文件夹目录下<br><div class="hljs"><pre><code class="hljs shell">force_install_dir ./csgo_server</code></pre></div></p>
+<p>最后安装CSGO服务端，这里需要下载CSGO Server的程序，所以速度视网络状况和带宽而定。<br><div class="hljs"><pre><code class="hljs shell">app_update 740 validate</code></pre></div><br>安装完成后，应该可以看到<strong>Success</strong>的图样。<br><img src="http://image.sincos.vip/blog/20200427/GCaJy9G5N5Mg.png" srcset="/img/loading.gif" alt="安装（更新）成功"></p>
+<p>安装完成后，退出steamcmd<br><div class="hljs"><pre><code class="hljs shell">quit</code></pre></div></p>
+<h2 id="编写CSGO-Server更新脚本"><a href="#编写CSGO-Server更新脚本" class="headerlink" title="编写CSGO Server更新脚本"></a>编写CSGO Server更新脚本</h2><p>该步骤为了更新方便，非必要步骤。</p>
+<h4 id="编写steamcmd-runscript脚本"><a href="#编写steamcmd-runscript脚本" class="headerlink" title="编写steamcmd runscript脚本"></a>编写steamcmd runscript脚本</h4><p>在<code>steamcmd/</code>目录下创建<code>update.txt</code>文件<br><div class="hljs"><pre><code class="hljs shell">vim update.txt</code></pre></div></p>
+<p>在<code>update.txt</code>中输入以下语句<br><div class="hljs"><pre><code class="hljs shell">login anonymous
+force_install_dir ./csgo_server
+app_update 740
+quit</code></pre></div></p>
+<h4 id="编写steamcmd运行脚本"><a href="#编写steamcmd运行脚本" class="headerlink" title="编写steamcmd运行脚本"></a>编写steamcmd运行脚本</h4><p>在<code>steamcmd/</code>目录下创建<code>csgo_server_update.sh</code>脚本文件<br><div class="hljs"><pre><code class="hljs shell">vim csgo_server_update.sh</code></pre></div><br>在<code>csgo_server_update.sh</code>中输入以下语句后保存退出<br><div class="hljs"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash">!/bin/bash</span>
+./steamcmd.sh +runscript update.txt</code></pre></div></p>
+<h4 id="测试脚本"><a href="#测试脚本" class="headerlink" title="测试脚本"></a>测试脚本</h4><p>在<code>steamcmd/</code>目录下运行脚本<code>csgo_server_update.sh</code><br><div class="hljs"><pre><code class="hljs shell">./csgo_server_update.sh</code></pre></div><br>如果运行成功，则提示<code>Success</code>字样，以后便可采用该脚本来更新CSGO Server脚本</p>
+<p>如果出现权限不足的问题，则需要提升权限，再次运行<br><div class="hljs"><pre><code class="hljs shell">chmod 775 csgo_server_update.sh</code></pre></div></p>
+<h2 id="配置并运行CSGO-Server"><a href="#配置并运行CSGO-Server" class="headerlink" title="配置并运行CSGO Server"></a>配置并运行CSGO Server</h2><h4 id="前往Steam-游戏服务器帐户管理注册登录Steam账号后注册Steam服务器登陆令牌"><a href="#前往Steam-游戏服务器帐户管理注册登录Steam账号后注册Steam服务器登陆令牌" class="headerlink" title="前往Steam 游戏服务器帐户管理注册登录Steam账号后注册Steam服务器登陆令牌"></a>前往<a href="https://steamcommunity.com/dev/managegameservers" target="_blank" rel="noopener">Steam 游戏服务器帐户管理</a>注册登录Steam账号后注册Steam服务器登陆令牌</h4><p>注：如果没有该令牌，则无法联网连接该服务器，只能从本地网络连接。</p>
+<p>在App ID中填入<strong>730</strong>，备忘录中填入<strong>CSGO Server</strong>（此处任意填写）。然后点击创建，获取登陆令牌。</p>
+<p><img src="http://image.sincos.vip/blog/20200427/YI8fkvCeDxnk.png" srcset="/img/loading.gif" alt="注册Steam服务器令牌"></p>
+<h4 id="下载Server-Config"><a href="#下载Server-Config" class="headerlink" title="下载Server Config"></a>下载Server Config</h4><p>切换目录到CSGO的cfg文件夹下，下载server.cfg文件<br><div class="hljs"><pre><code class="hljs shell">cd csgo_server/csgo/cfg/
+wget http://www.csgodev.com/downloads/server.cfg
+vim server.cfg</code></pre></div></p>
+<p>进入编辑模式，在<code>server.cfg</code>中添加刚刚注册的登陆令牌，修改部分参数<br><div class="hljs"><pre><code class="hljs shell">// 新增以下参数：
+// steam account，修改为自己刚刚申请的登陆令牌
+sv_setsteamaccount "**********************"
+
+// 找到并修改以下参数：
+// 服务器名称，安全方面
+hostname "Private Server"    // 服务器在社区服务器浏览器上显示的名称，自行修改为喜欢的名字
+rcon_password "12345678"    // CS:GO远程控制台密码，修改为自己定义的密码
+sv_password "87654321"    // 服务器连接密码，在连接服务器时输入，不要密码可以留空
+// 游戏参数方面
+sv_maxrate "128000"   // 服务器最大带宽使用量，默认值非常小，因此会造成choke值异常，此处建议改为128000
+sv_minrate "80000"    // 服务器最小带宽使用量，与上面同理，此处建议改为80000
+sv_accelerate "5.5"   // 人物移动速度，默认值为10，快到恶心，此处建议修改为5.5
+sv_staminamax 120     // 人物耐力，这里影响跳跃/连跳感受</code></pre></div><br>修改完以上参数之后，服务器便可以启动了，关于<code>server.cfg</code>中的其他参数说明，可以在<code>server.cfg</code>文件的注释中查看，也可以前往<a href="http://csgodev.com/csgodev-server-cfg-for-csgo/" target="_blank" rel="noopener">CSGODev</a>查看。</p>
+<h4 id="开放UDP-27015-端口"><a href="#开放UDP-27015-端口" class="headerlink" title="开放UDP 27015 端口"></a>开放UDP 27015 端口</h4><p>前往阿里云控制面板&gt;安全组设置，开放 <strong>UDP 27015端口</strong>。</p>
+<h4 id="安装screen，启动CSGO-Server"><a href="#安装screen，启动CSGO-Server" class="headerlink" title="安装screen，启动CSGO Server"></a>安装screen，启动CSGO Server</h4><p>安装screen，以便CS:GO服务进程在后台运行<br><div class="hljs"><pre><code class="hljs shell">sudo yum install screen</code></pre></div></p>
+<p>返回csgo_server目录，使用screen创建新的会话<br><div class="hljs"><pre><code class="hljs shell">cd /home/steam/steamcmd/csgo_server/
+screen -S csgo</code></pre></div><br><strong>注意：进入Screen后，可以使用快捷键：Ctrl + A + D暂离当前会话（不中断会话中进程）</strong><br>下面插播一点Screen的用法：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">命令</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>screen -S [name]</code></td>
+<td style="text-align:center">创建名为name的会话窗口</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>screen -R [name]</code></td>
+<td style="text-align:center">恢复名为name的会话内容</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>screen -ls</code></td>
+<td style="text-align:center">列出当前的所有会话及其状态</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>exit</code></td>
+<td style="text-align:center">退出会话，当会话结束后退出</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>Ctrl + A + D</code></td>
+<td style="text-align:center">暂时退出当前会话（不结束进程）</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>为了方便，可以在<code>~/steamcmd/csgo_server/</code>目录下创建启动脚本<code>start.sh</code><br><div class="hljs"><pre><code class="hljs shell">cd /home/steam/steamcmd/csgo_server
+vim start.sh</code></pre></div><br>打开后输入启动脚本和相关参数<br><div class="hljs"><pre><code class="hljs shell">./srcds_run \
+-debug \
+-game csgo \
+-usercon \
+-console \
+-tickrate 128 \
+-port 27015 \
+-steamcmd_script /home/steam/steamcmd/update.txt \
+-steam_dir /home/steam/ \
++host_workshop_map 465367694 -authkey **********************************</code></pre></div><br>保存退出后，执行<code>./start.sh</code>即可启动服务器</p>
+<p><strong>若系统提示没有srcds_run这个文件，则是你当前的文件夹目录不正确</strong></p>
+<blockquote>
+<p><strong>参数解释：</strong><br>-debug <strong>开启调试模式</strong><br>-game csgo <strong>指明服务器启动游戏：CSGO</strong><br>-usercon <strong>开启user control，即用户可在游戏中使用前面设置的密码进行参数的调整</strong><br>-console <strong>开启游戏控制台</strong><br>-port <strong>游戏服务程序运行端口</strong><br>-steamcmd_script <strong>运行steamcmd的脚本文件地址</strong><br>-steam_dir <strong>Steam的安装地址</strong><br>+host_workshop_map 465367694 <strong>切换地图为来自创意工坊的地图</strong><br>-authkey Steam <strong>Steam网页API的Authkey</strong></p>
+</blockquote>
+<h2 id="使用创意工坊地图"><a href="#使用创意工坊地图" class="headerlink" title="使用创意工坊地图"></a>使用创意工坊地图</h2><h4 id="注册Steam网页API"><a href="#注册Steam网页API" class="headerlink" title="注册Steam网页API"></a>注册Steam网页API</h4><p>前往<a href="https://steamcommunity.com/dev/apikey" target="_blank" rel="noopener">注册 Steam 网页 API 密钥</a>注册API，获得Authkey（注意不要泄露出去）</p>
+<h4 id="获取创意工坊地图ID"><a href="#获取创意工坊地图ID" class="headerlink" title="获取创意工坊地图ID"></a>获取创意工坊地图ID</h4><p>在Steam创意工坊中打开想要的地图页面，可以看到url中的地图ID，修改到上述服务器启动位置即可。</p>
+<h4 id="更换地图"><a href="#更换地图" class="headerlink" title="更换地图"></a>更换地图</h4><p>如果不想通过重启服务器的方法来更换地图，可以在服务器控制台中输入以下命令：<br><div class="hljs"><pre><code class="hljs 1c">changelevel XXXX    <span class="hljs-comment">// XXXX可以是创意工坊地图ID，也可以是官方地图名字</span></code></pre></div></p>
+<h4 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h4><p>关于更多创意工坊地图的命令，可以参考<a href="https://developer.valvesoftware.com/wiki/CSGO_Workshop_For_Server_Operators" target="_blank" rel="noopener">官方文档</a></p>
+<h2 id="添加更多Mod和插件"><a href="#添加更多Mod和插件" class="headerlink" title="添加更多Mod和插件"></a>添加更多Mod和插件</h2><p>常用插件为sourcemod和metamod，装了这俩之后才能装满十，kz，僵尸等等插件。</p>
+<h4 id="SourceMod插件"><a href="#SourceMod插件" class="headerlink" title="SourceMod插件"></a>SourceMod插件</h4><p>SourceMod插件需要先到<a href="https://www.sourcemod.net" target="_blank" rel="noopener">SourceMod</a>下载指定系统的插件文件，下载完毕后将解压的<code>addons/</code>和<code>cfg/</code>两个文件夹复制到<code>~/steamcmd/csgo_server/csgo/</code>目录下即可。</p>
+<p>然后到修改<code>~/steamcmd/csgo_server/csgo/addons/sourcemod/configs/admins_simple.ini</code>文件，在文件结尾添加，输入对应的steamID授予管理员权限。<br><a href="https://steamid.io/" target="_blank" rel="noopener">steamID可以在此获取</a><br><div class="hljs"><pre><code class="hljs shell">"（此处输入steamID：STEAM_0:0:********）" "99:z"</code></pre></div><br>完成后可以在游戏中按<code>y</code>或<code>u</code>发言，输入<code>!admin</code>或<code>/admin</code>开启管理员菜单，方便管理游戏内容。</p>
+<h4 id="MetaMod插件"><a href="#MetaMod插件" class="headerlink" title="MetaMod插件"></a>MetaMod插件</h4><p>同SourceMod一样，需要先到<a href="https://www.metamodsource.net" target="_blank" rel="noopener">MetaMod</a>下载指定系统的插件文件，下载完毕后将解压后的<code>addons/</code>和<code>cfg/</code>两个文件夹复制到<code>~/steamcmd/csgo_server/csgo/</code>目录下即可。</p>
+<h4 id="全皮肤插件（有封服务器token风险）"><a href="#全皮肤插件（有封服务器token风险）" class="headerlink" title="全皮肤插件（有封服务器token风险）"></a>全皮肤插件（有封服务器token风险）</h4><p><strong>注意：使用全皮肤插件有封服务器token风险，并且可能牵连绑定同手机号的steam账号，请慎重使用</strong></p>
+<p>全皮肤插件可以自定义武器、刀和手套的皮肤。<br>与之前插件同理，下载对应插件，复制<code>addons/</code>和<code>cfg/</code>两个文件夹到<code>~/steamcmd/csgo_server/csgo/</code>目录下即可。</p>
+<p>首先需要安装<a href="https://ptah.zizt.ru/" target="_blank" rel="noopener">PTaH</a>，然后下载<a href="https://github.com/kgns/weapons/releases" target="_blank" rel="noopener">Weapons</a>和<a href="https://github.com/kgns/gloves/releases" target="_blank" rel="noopener">Gloves</a><br>将上述文件解压后复制到<code>~/steamcmd/csgo_server/csgo/</code>目录下。</p>
+<p>然后将<code>~/steamcmd/csgo_server/csgo/addons/sourcemod/configs/core.cfg</code>中最后的<br><div class="hljs"><pre><code class="hljs shell">"FollowCSGOServerGuidelines"    "yes"</code></pre></div><br>修改为<br><div class="hljs"><pre><code class="hljs shell">"FollowCSGOServerGuidelines"    "no"</code></pre></div><br><img src="http://image.sincos.vip/blog/20200427/zXhE65obmQDo.png" srcset="/img/loading.gif" alt="core.cfg"></p>
+<p>这样就可以在游戏中输入<code>!ws</code>、<code>!knife</code>和<code>!gloves</code>就可以选择自己想要的皮肤啦。</p>
+<h4 id="其他插件"><a href="#其他插件" class="headerlink" title="其他插件"></a>其他插件</h4><p>其它有用的插件比如warmod等等可以在x社区找到，安装方法一般是放在cfg以及addon文件夹内，使用方法在插件原文里说明的也比较详细，这里给出网址不赘述了。<br><a href="https://www.sourcemod.net" target="_blank" rel="noopener">SourceMod</a><br><a href="https://www.metamodsource.net" target="_blank" rel="noopener">MetaMod</a><br><a href="https://bbs.93x.net" target="_blank" rel="noopener">X社区</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>经过上述的一系列操作，就可以畅快的搭建自己的CSGO Server与好友愉快玩耍啦！</p>
+<p>后续启动服务器只需使用<code>ssh</code>登陆服务器。<br><div class="hljs"><pre><code class="hljs shell">su steam
+cd /home/steam/steamcmd/csgo_server
+screen -S csgo
+./start.sh
+<span class="hljs-meta">#</span><span class="bash"> Ctrl + A + D</span></code></pre></div><br>或恢复之前的会话窗口即可。<br><div class="hljs"><pre><code class="hljs shell">screen -R csgo</code></pre></div></p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ol>
+<li><a href="https://www.jianshu.com/p/b2cde3ba7908" target="_blank" rel="noopener">FisherYung</a>的博客</li>
+<li><a href="http://csgodev.com/csgodev-server-cfg-for-csgo/" target="_blank" rel="noopener">CSGODev</a></li>
+<li><a href="https://steamcommunity.com/dev/managegameservers" target="_blank" rel="noopener">Steam 游戏服务器帐户管理</a></li>
+<li><a href="https://steamcommunity.com/dev/apikey" target="_blank" rel="noopener">注册 Steam 网页 API 密钥</a></li>
+<li><a href="https://developer.valvesoftware.com/wiki/CSGO_Workshop_For_Server_Operators" target="_blank" rel="noopener">创意工坊命令官方文档</a></li>
+<li><a href="https://www.sourcemod.net" target="_blank" rel="noopener">SourceMod</a></li>
+<li><a href="https://www.metamodsource.net" target="_blank" rel="noopener">MetaMod</a></li>
+<li><a href="https://bbs.93x.net" target="_blank" rel="noopener">X社区</a></li>
+</ol>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%B8%B8%E6%88%8F-Game/">游戏(Game)</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/CS-GO/">CS:GO</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Server/">Server</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/02/03/OS-Chapter-8-I-O-Management/">
+                        <span class="hidden-mobile">OS Chapter 8 I/O Management</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <script type="text/javascript">
+    function loadUtterances() {
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.defer = false
+      s.setAttribute('repo', 'Azerrroth/comments-utterances');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('theme', 'github-light');
+      s.setAttribute('crossorigin', 'anonymous');
+      var e = document.getElementsByTagName('script')[0];
+      e.parentNode.insertBefore(s, e);
+    }
+    createObserver(loadUtterances, 'comments')
+  </script>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Cent OS 搭建CS:GO 服务器&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "false",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+</body>
+</html>

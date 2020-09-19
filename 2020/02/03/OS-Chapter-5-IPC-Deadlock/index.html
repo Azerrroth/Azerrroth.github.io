@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#561f55">
+  <meta name="description" content="">
+  <meta name="author" content="Azerrroth">
+  <meta name="keywords" content="">
+  <title>OS Chapter 5 IPC: Deadlock ~ Codeless</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Codeless</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/Background/earth.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2020-02-03 16:15">
+      February 3, 2020 pm
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.3k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      23
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="Deadlock-Definition"><a href="#Deadlock-Definition" class="headerlink" title="Deadlock Definition"></a>Deadlock Definition</h2><p>在并发环境下，各进程因竞争资源而造成的一种<strong>互相等待</strong>对方手里的资源，导致各进程<strong>都阻塞</strong>，都无法向前推进得现象，就是“死锁”<br>规范定义：如果一个进程集合中的每个进程都在等待只能由该进程集合中的其他进程才能引发的事件，那么，该进程集合就是死锁的。</p>
+<p>死锁：各进程互相等待对方手里的资源，导致各进程都阻塞，无法向前推进<br>饥饿：由于长期得不到想要的资源，某进程无法向前推进的现象<br>死循环：进程执行过程中一直跳不出某个循环的现象<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717602316-ebfceade-2eae-4433-a96c-19fbb6a7a640.png#height=360&amp;width=1128" srcset="/img/loading.gif" alt=""> </p>
+<h3 id=""><a href="#" class="headerlink" title=" "></a> </h3><h3 id="死锁的原因"><a href="#死锁的原因" class="headerlink" title="死锁的原因"></a>死锁的原因</h3><ul>
+<li>抢占资源，资源不可剥夺</li>
+<li>多个进程的运行顺序非法</li>
+<li>信号量使用不当<br>对不可剥夺资源分配不合理，就会发生死锁。<h3 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h3>就是资源导致死锁<br>硬件、软件、信息<br>抢占式、非抢占式<h4 id="非抢占式（Nonpreemptable）资源"><a href="#非抢占式（Nonpreemptable）资源" class="headerlink" title="非抢占式（Nonpreemptable）资源"></a>非抢占式（Nonpreemptable）资源</h4>在不引起相关计算失败的情况下，无法把它从占有的进程抢占过来。<h4 id="抢占式（Preemptable）资源"><a href="#抢占式（Preemptable）资源" class="headerlink" title="抢占式（Preemptable）资源"></a>抢占式（Preemptable）资源</h4>可以从拥有它的进程中抢占而不会产生任何副作用（比如存储器）<h4 id="使用资源的顺序："><a href="#使用资源的顺序：" class="headerlink" title="使用资源的顺序："></a>使用资源的顺序：</h4></li>
+</ul>
+<ol>
+<li>请求资源</li>
+<li>使用资源</li>
+<li>释放资源</li>
+</ol>
+<h3 id="死锁的处理"><a href="#死锁的处理" class="headerlink" title="死锁的处理"></a>死锁的处理</h3><ol>
+<li>忽略该问题（鸵鸟算法）</li>
+<li>检测死锁并恢复</li>
+<li>仔细对资源进行分配，动态地避免死锁</li>
+<li>通过破坏引起死锁的四个必要条件之一，防止死锁的产生</li>
+</ol>
+<h2 id="Deadlock-Conditions"><a href="#Deadlock-Conditions" class="headerlink" title="Deadlock Conditions"></a>Deadlock Conditions</h2><h3 id="死锁产生的条件"><a href="#死锁产生的条件" class="headerlink" title="死锁产生的条件"></a>死锁产生的条件</h3><ul>
+<li><strong>互斥条件</strong>：只有对互斥使用的资源争抢才会导致死锁</li>
+<li><strong>不可抢占条件</strong>：进程所获得的资源在未完成前，不能由其他进程强行夺走</li>
+<li><strong>占有和等待（请求和保持）条件</strong>：进程已经保持了至少一个资源，但又提出了新的资源请求</li>
+<li><strong>循环等待条件</strong>：有一种进程资源的循环等待链，链中每个进程已经获得的资源同时被下一个进程所请求。循环等待未必死锁，死锁 必 循环等待</li>
+</ul>
+<h2 id="Deadlock-Modeling"><a href="#Deadlock-Modeling" class="headerlink" title="Deadlock Modeling"></a>Deadlock Modeling</h2><p>死锁的模型</p>
+<ul>
+<li>使用有向无环图来描述死锁中进程和资源的关系。其中，进程用圆圈⚪表示，资源用方块■表示。</li>
+</ul>
+<p>请求边：进程节点 -&gt; 资源节点<br>分配边：资源节点 -&gt; 进程节点</p>
+<h2 id="Deadlock-Detection"><a href="#Deadlock-Detection" class="headerlink" title="Deadlock Detection"></a>Deadlock Detection</h2><p>死锁检测和死锁恢复<br>构建一张资源分配图<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717602696-3c1ba38a-834a-4962-bd74-fb48232f17fb.png#height=532&amp;width=932" srcset="/img/loading.gif" alt=""><br>从图中可以看到，已经构成环，所以就出现了死锁。</p>
+<h3 id="死锁检测算法——每种类型一个资源"><a href="#死锁检测算法——每种类型一个资源" class="headerlink" title="死锁检测算法——每种类型一个资源"></a>死锁检测算法——每种类型一个资源</h3><ol>
+<li>对图中每个节点N，将N作为起始点执行下面5个步骤</li>
+<li>将L初始化为空表，并清除所有的有向边标记</li>
+<li>将当前节点添加到L的尾部，并检查该节点是否在L中已经出现过两次。如果是，那么该图包含了一个环（已经列在L中），算法结束</li>
+<li>从给定节点开始，检测是否存在没有标记的从该节点出发的有向边。如果存在的话，执行(5)；如果不存在，执行(6)</li>
+<li>随机选取一条没有标记的从该节点出发的有向边，标记它。然后顺着这条有向边找到新的当前节点，返回(3)</li>
+<li>如果该节点是起始节点，那么表明途中不存在任何环，算法结束。否则意味着走进了死胡同，所以需要移走该节点，返回到前一个节点，即当前节点前面的一个节点，并把它作为新的当前节点，同时转到(3)</li>
+</ol>
+<h3 id="死锁检测算法——每种类型多个资源"><a href="#死锁检测算法——每种类型多个资源" class="headerlink" title="死锁检测算法——每种类型多个资源"></a>死锁检测算法——每种类型多个资源</h3><p>数据结构：E向量（现有资源）、A向量（<strong>可用资源</strong>）、C矩阵（<strong>分配矩阵</strong>）、R矩阵（<strong>请求矩阵</strong>）</p>
+<ol>
+<li>寻找一个没有标记的进程Pi，对于他而言R矩阵的第i行向量≤A</li>
+<li>如果找到这样一个进程，那么将C矩阵的第i行向量加入A中，标记该步骤，并转到第一步</li>
+<li>如果没有这样的进程，那么算法终止<br>算法结束时，所有没有标记过的进程都是死锁进程<h2 id="Deadlock-Recovery"><a href="#Deadlock-Recovery" class="headerlink" title="Deadlock Recovery"></a>Deadlock Recovery</h2><h3 id="利用抢占恢复"><a href="#利用抢占恢复" class="headerlink" title="利用抢占恢复"></a>利用抢占恢复</h3>挂起死锁进程，并抢占它的资源，将这些资源分配给其他的死锁线程。<h3 id="利用回滚恢复"><a href="#利用回滚恢复" class="headerlink" title="利用回滚恢复"></a>利用回滚恢复</h3>让一个或多个死锁进程回退到足以避免死锁的地步。要求系统记录进程历史信息，设置还原点。<h3 id="利用杀死进程恢复"><a href="#利用杀死进程恢复" class="headerlink" title="利用杀死进程恢复"></a>利用杀死进程恢复</h3>强制撤销部分、全部死锁的进程，并剥夺进程资源。实现简单，但是代价可能会很大。</li>
+</ol>
+<p>对谁动手：考虑 <strong>进程优先级、已执行时间、还要多久能完成、进程占用了多少资源、进程是交互式or批处理</strong></p>
+<h2 id="Deadlock-Avoidance"><a href="#Deadlock-Avoidance" class="headerlink" title="Deadlock Avoidance"></a>Deadlock Avoidance</h2><ul>
+<li>安全序列：如果系统按照安全序列分配资源，则每个进程都能顺利完成。（安全序列不唯一）</li>
+<li><strong>安全状态</strong>：如果当前可以得到一个安全序列执行完全部进程，那么该状态就是一个安全状态。</li>
+<li><strong>不安全状态</strong>：如果当前没有一个安全序列可以执行完全部进程，那么该状态就是不安全状态。<br>（不安全状态不一定发生死锁，但是死锁一定是在不安全状态）<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717603118-3fe8d46a-645c-403c-b069-185cc8120b0a.png#height=642&amp;width=1006" srcset="/img/loading.gif" alt=""> <h3 id="银行家算法"><a href="#银行家算法" class="headerlink" title="银行家算法"></a>银行家算法</h3></li>
+</ul>
+<ol>
+<li>查找右边矩阵是否有一行，其没有被满足的资源数均≤A。如果不存在，那么系统将可能死锁。</li>
+<li>假若找到这样一行，那么可以假设它获得所需的资源并运行结束，将该进程标记为终止，并将其资源加到向量A上</li>
+<li>重复以上两步，或者直到所有的进程都标记为终止，其初始状态是安全的；或者所有进程的资源需求都得不到满足，此时就是发生了死锁。</li>
+</ol>
+<p>需要的数据结构：<strong>Max</strong>矩阵（描述进程<strong>最大需求</strong>）、Allocation矩阵（描述进程<strong>已分配资源</strong>）、Need矩阵（描述进程<strong>仍然需要的资源</strong>）、Available向量（描述当前<strong>系统可用资源</strong>）、Request向量（描述<strong>本次申请的各种资源量</strong>）<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717603392-dbd84a85-1ffa-4458-af92-61f84a891c24.png#height=210&amp;width=1064" srcset="/img/loading.gif" alt=""> </p>
+<h2 id="Deadlock-Prevention"><a href="#Deadlock-Prevention" class="headerlink" title="Deadlock Prevention"></a>Deadlock Prevention</h2><h3 id="破坏互斥条件"><a href="#破坏互斥条件" class="headerlink" title="破坏互斥条件"></a>破坏互斥条件</h3><p>使用<strong>SPOOLing技术</strong>，把独占设备在逻辑上改造成<strong>共享设备</strong>。<br>缺点：不是所有资源都可以改造成共享设备</p>
+<h3 id="破坏非抢占式条件"><a href="#破坏非抢占式条件" class="headerlink" title="破坏非抢占式条件"></a>破坏非抢占式条件</h3><ul>
+<li>方案一：当某个进程请求新资源<strong>得不到满足</strong>，就<strong>立即释放保持的所有资源</strong>，等待以后需要的时候再重新申请。</li>
+<li>方案二：某个进程需要的资源被其他所有进程占有时，可以由操作系统协助，将想要的资源<strong>强制剥夺</strong>。这种方式考虑各进程的优先级</li>
+</ul>
+<p>缺点：</p>
+<ol>
+<li>实现复杂</li>
+<li>释放已获得资源可能会导致前一阶段工作失效，所以只适用于易保存、恢复状态的资源，如CPU</li>
+<li>反复申请和释放回增加系统开销，降低吞吐量。</li>
+<li>若方案一，每次释放自己全部资源，然后需要一个一个重新申请回来，这样就可能会导致进程饥饿。</li>
+</ol>
+<h3 id="破坏占有和等待条件"><a href="#破坏占有和等待条件" class="headerlink" title="破坏占有和等待条件"></a>破坏占有和等待条件</h3><p>用静态分配方法，即在<strong>进程运行之前一次性申请完所有需要的全部资源</strong>，则在资源未满足前，不让它投入运行。<strong>一旦投入运行，资源一直占有，不会请求别的资源。</strong></p>
+<p>缺点：</p>
+<ol>
+<li>有些资源可能仅仅需要很短的时间，那一直保持所有资源，就会造成严重的浪费，资源利用率低。</li>
+<li>可能导致某些进程饥饿</li>
+</ol>
+<h3 id="破坏循环等待条件"><a href="#破坏循环等待条件" class="headerlink" title="破坏循环等待条件"></a>破坏循环等待条件</h3><p>采用顺序资源分配法，给<strong>系统资源编号</strong>，规定<strong>每个进程按照编号递增的顺序请求资源</strong>，同类资源一次申请完。<br><strong>原理分析</strong>：一个进程只有己占有小编号的资源时，才有资格申请电大编号的资源。按此规则，己持有大编号资源的进程不可能逆向地回来申请小编号的资源，从而就不会产生循环等待的现象。 </p>
+<p>缺点：</p>
+<ol>
+<li>不方便增加新设备，因为可能要重更新分配所有编号</li>
+<li>进程实际使用资源的顺序可能和编号递增顺序不一致，会造成资源浪费</li>
+<li>必须按规定次序申请资源，编程麻烦</li>
+</ol>
+<h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><p>两阶段加锁：在第一阶段，进程试图对所有所需的记录进行加锁，一次锁一个记录。如果第一阶段加锁成功，就开始第二阶段，完成更新然后释放锁。在第一阶段并没有做实际的工作。<br>通信死锁<br>活锁：忙等待可能导致<br>饥饿</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-Operating-System/">操作系统(Operating System)</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Operating-System/">Operating System</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/02/03/OS-Chapter-6-File-System/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">OS Chapter 6 File System</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/02/03/OS-Chapter-4-Process-Thread-Scheduling/">
+                        <span class="hidden-mobile">OS Chapter 4 Process Thread Scheduling</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <script type="text/javascript">
+    function loadUtterances() {
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.defer = false
+      s.setAttribute('repo', 'Azerrroth/comments-utterances');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('theme', 'github-light');
+      s.setAttribute('crossorigin', 'anonymous');
+      var e = document.getElementsByTagName('script')[0];
+      e.parentNode.insertBefore(s, e);
+    }
+    createObserver(loadUtterances, 'comments')
+  </script>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "OS Chapter 5 IPC: Deadlock&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "false",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+</body>
+</html>
