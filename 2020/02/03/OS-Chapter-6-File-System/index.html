@@ -249,8 +249,9 @@
 <li><strong>主引导记录（Master Boot Record，MBR）</strong>：用来引导计算机，是<strong>引导块</strong>（boot block）</li>
 <li><strong>分区表（Partitions）</strong></li>
 <li><strong>超级块（Superblock）</strong>包含文件系统所有关键参数，计算机启动时，或文件系统首次使用时，把超级块读入内存。</li>
-<li><strong>i-node</strong>：是一个数据结构数组，<strong>每个文件一个</strong>。i-node说明了文件的<strong>方方面面信息</strong>。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717853359-55cb70bc-1dfe-45f6-92d2-4acc35a4ed8b.png#height=410&amp;width=832" srcset="/img/loading.gif" alt=""> <h3 id="文件的实现"><a href="#文件的实现" class="headerlink" title="文件的实现"></a>文件的实现</h3><h4 id="连续分配"><a href="#连续分配" class="headerlink" title="连续分配"></a>连续分配</h4>每个文件作为一连串连续数据块存储在磁盘上。每个文件都从一个<strong>新的块</strong>开始存放。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717853657-466aa111-7598-42bb-9e2a-09f8a0f64939.png#height=438&amp;width=778" srcset="/img/loading.gif" alt=""><br>优点：</li>
+<li><strong>i-node</strong>：是一个数据结构数组，<strong>每个文件一个</strong>。i-node说明了文件的<strong>方方面面信息</strong>。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717853359-55cb70bc-1dfe-45f6-92d2-4acc35a4ed8b.png#height=410&amp;width=832" srcset="/img/loading.gif" alt=""> <h3 id="文件的实现"><a href="#文件的实现" class="headerlink" title="文件的实现"></a>文件的实现</h3></li>
 </ul>
+<h4 id="连续分配"><a href="#连续分配" class="headerlink" title="连续分配"></a>连续分配</h4><p>每个文件作为一连串连续数据块存储在磁盘上。每个文件都从一个<strong>新的块</strong>开始存放。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717853657-466aa111-7598-42bb-9e2a-09f8a0f64939.png#height=438&amp;width=778" srcset="/img/loading.gif" alt=""><br>优点：</p>
 <ol>
 <li>实现简单：记录每个文件只需记住第一块的磁盘地址和文件的块数</li>
 <li>读操作性能好：单个操作就可以从磁盘上读出整个文件，只需要一次，之后就不再需要寻道和旋转延迟。</li>
@@ -297,8 +298,10 @@
 <ol>
 <li>磁盘块链表：每个块中包含尽可能多的<strong>空闲磁盘块号</strong></li>
 <li>位图：n个块的磁盘需要n位的位图，空闲块用1表示，反之用0表示。</li>
-<li>成组连接法<h4 id="磁盘配额"><a href="#磁盘配额" class="headerlink" title="磁盘配额"></a>磁盘配额</h4><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717856720-956b8127-556c-44bc-adf9-4c07601dc6b9.png#height=468&amp;width=678" srcset="/img/loading.gif" alt=""><br>系统管理员分给每个用户拥有文件和块的最大数量，操作系统确保每个用户不超过分给他们的配额<h3 id="文件系统备份"><a href="#文件系统备份" class="headerlink" title="文件系统备份"></a>文件系统备份</h3>物理转储：从磁盘0块开始，将全部的磁盘块按顺序输出到磁带上，直到最后一块复制完毕。</li>
+<li>成组连接法</li>
 </ol>
+<h4 id="磁盘配额"><a href="#磁盘配额" class="headerlink" title="磁盘配额"></a>磁盘配额</h4><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717856720-956b8127-556c-44bc-adf9-4c07601dc6b9.png#height=468&amp;width=678" srcset="/img/loading.gif" alt=""><br>系统管理员分给每个用户拥有文件和块的最大数量，操作系统确保每个用户不超过分给他们的配额</p>
+<h3 id="文件系统备份"><a href="#文件系统备份" class="headerlink" title="文件系统备份"></a>文件系统备份</h3><p>物理转储：从磁盘0块开始，将全部的磁盘块按顺序输出到磁带上，直到最后一块复制完毕。</p>
 <ul>
 <li>优点：简单、极为快速</li>
 <li>缺点：既不能能跳过选定目录，也无法增量转储，还不能满足恢复个人文件的请求。</li>
@@ -315,8 +318,9 @@
 <h3 id="减少磁盘臂运动"><a href="#减少磁盘臂运动" class="headerlink" title="减少磁盘臂运动"></a>减少磁盘臂运动</h3><p>把有可能顺序存取的块放在一起，最好放在同一个柱面上，从而减少磁盘臂的移动次数。<br><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580717857451-7c7eb097-bebd-46f2-a654-c14638ee85dd.png#height=504&amp;width=812" srcset="/img/loading.gif" alt=""> </p>
 <ol>
 <li>i-node 放在磁盘的开始块</li>
-<li>把磁盘分为柱面组，每个组有自己的块和i-node（这样快）<h2 id="File-System-Cases"><a href="#File-System-Cases" class="headerlink" title="File System Cases"></a>File System Cases</h2>例子，先不看了。</li>
+<li>把磁盘分为柱面组，每个组有自己的块和i-node（这样快）</li>
 </ol>
+<h2 id="File-System-Cases"><a href="#File-System-Cases" class="headerlink" title="File System Cases"></a>File System Cases</h2><p>例子，先不看了。</p>
 
             </article>
             <hr>
