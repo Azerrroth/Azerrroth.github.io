@@ -316,15 +316,17 @@
 <h4 id="设备驱动程序的统一接口"><a href="#设备驱动程序的统一接口" class="headerlink" title="设备驱动程序的统一接口"></a>设备驱动程序的统一接口</h4><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719932399-911249cf-6089-411c-8db9-d2888fa4889d.png#height=366&amp;width=698" srcset="/img/loading.gif" alt=""> </p>
 <ul>
 <li>没有标准驱动的程序接口：需要大量全新的编程工作，为每个设备编写驱动程序。</li>
-<li>有标准的驱动程序接口：只需要直到驱动程序接口什么亚子，就很轻松容易。<h4 id="缓冲"><a href="#缓冲" class="headerlink" title="缓冲"></a>缓冲</h4><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719932661-e6a0206e-cd19-4525-b823-876d34701d0b.png#height=356&amp;width=672" srcset="/img/loading.gif" alt=""> </li>
+<li>有标准的驱动程序接口：只需要直到驱动程序接口什么亚子，就很轻松容易。</li>
 </ul>
+<h4 id="缓冲"><a href="#缓冲" class="headerlink" title="缓冲"></a>缓冲</h4><p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719932661-e6a0206e-cd19-4525-b823-876d34701d0b.png#height=356&amp;width=672" srcset="/img/loading.gif" alt=""> </p>
 <ol>
 <li>没缓冲：对于每个到来的字符，都必须启动用户进程</li>
 <li>用户缓冲：放入缓冲区直到字符填满。（如果缓冲区被分页调出内存，就把缓冲区锁定在内存中，可能会下降系统性能）</li>
 <li>内核空间缓冲复制到用户空间：一个不够就来俩</li>
 <li>双缓冲：一个满了放另一个，一个复制给用户缓冲。另一个满了这一个复制完了也清空了。</li>
-<li>循环缓冲区：一个指针指向下一个空闲的字，另一个指针指向缓冲区数据第一个字。<h4 id="错误报告"><a href="#错误报告" class="headerlink" title="错误报告"></a>错误报告</h4>错误在I/O环境中更为常见<br>I/O错误类型</li>
+<li>循环缓冲区：一个指针指向下一个空闲的字，另一个指针指向缓冲区数据第一个字。</li>
 </ol>
+<h4 id="错误报告"><a href="#错误报告" class="headerlink" title="错误报告"></a>错误报告</h4><p>错误在I/O环境中更为常见<br>I/O错误类型</p>
 <ul>
 <li>编程错误：只是将一个错误代码报告返回给调用者</li>
 <li>实际I/O错误：由驱动程序决定做什么，驱动不知道就向上传递</li>
