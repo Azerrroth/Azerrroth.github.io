@@ -228,7 +228,8 @@
 <p>“IN R0，4”读取I/O端口4的内容放入R0   (5-2a)<br>“MOV R0，4”读取内存字4的内容放入R0  (5-2b)</p>
 </blockquote>
 <p><img src="https://cdn.nlark.com/yuque/0/2020/png/431085/1580719931119-93788741-d69f-4f60-8329-e55b8ef27798.png#height=308&amp;width=728" srcset="/img/loading.gif" alt=""> </p>
-<h4 id="内存映射-I-O"><a href="#内存映射-I-O" class="headerlink" title="内存映射 I/O"></a>内存映射 I/O</h4><p>将所有控制寄存器映射到内存空间中，每个控制寄存器被分配唯一的一个内存地址，并且不会有内存被分配这一地址。<br>优点：</p>
+<h4 id="内存映射-I-O"><a href="#内存映射-I-O" class="headerlink" title="内存映射 I/O"></a>内存映射 I/O</h4><p>将所有控制寄存器映射到内存空间中，每个控制寄存器被分配唯一的一个内存地址，并且不会有内存被分配这一地址。</p>
+<p>优点：</p>
 <ol>
 <li>I/O设备驱动程序可以用C语言来写，如果不是内存映射IO，就得用汇编。</li>
 <li>不需要特殊的保护机制来组织用户进程执行I/O操作</li>
